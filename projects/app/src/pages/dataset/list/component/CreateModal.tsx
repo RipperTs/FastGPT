@@ -115,6 +115,7 @@ const CreateModal = ({ onClose, parentId }: { onClose: () => void; parentId?: st
       isCentered={!isPc}
       w={'450px'}
     >
+      {/*创建知识库弹层*/}
       <ModalBody py={2}>
         <>
           <Box mb={1} color={'myGray.900'}>
@@ -129,18 +130,6 @@ const CreateModal = ({ onClose, parentId }: { onClose: () => void; parentId?: st
                 value: DatasetTypeEnum.dataset,
                 icon: 'core/dataset/commonDataset',
                 desc: datasetT('common_dataset_desc')
-              },
-              {
-                title: datasetT('website_dataset'),
-                value: DatasetTypeEnum.websiteDataset,
-                icon: 'core/dataset/websiteDataset',
-                desc: datasetT('website_dataset_desc')
-              },
-              {
-                title: datasetT('external_file'),
-                value: DatasetTypeEnum.externalFile,
-                icon: 'core/dataset/externalDataset',
-                desc: datasetT('external_file_dataset_desc')
               }
             ]}
             value={datasetType}
@@ -149,7 +138,7 @@ const CreateModal = ({ onClose, parentId }: { onClose: () => void; parentId?: st
         </>
         <Box mt={5}>
           <Box color={'myGray.900'}>{t('common:common.Set Name')}</Box>
-          <Flex mt={1} alignItems={'center'}>
+          <Flex mt={3} alignItems={'center'}>
             <MyTooltip label={t('common:common.avatar.Select Avatar')}>
               <Avatar
                 flexShrink={0}
