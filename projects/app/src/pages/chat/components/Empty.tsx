@@ -3,11 +3,9 @@ import { Card, Box, Flex } from '@chakra-ui/react';
 import { useMarkdown } from '@/web/common/hooks/useMarkdown';
 
 import dynamic from 'next/dynamic';
-const Markdown = dynamic(() => import('@/components/Markdown'));
 const Avatar = dynamic(() => import('@fastgpt/web/components/common/Avatar'));
 
 const Empty = ({
-  showChatProblem,
   model: { name, intro, avatar }
 }: {
   showChatProblem: boolean;
@@ -17,9 +15,6 @@ const Empty = ({
     avatar: string;
   };
 }) => {
-  const { data: chatProblem } = useMarkdown({ url: '/chatProblem.md' });
-  const { data: versionIntro } = useMarkdown({ url: '/versionIntro.md' });
-
   return (
     <Box
       minH={'100%'}
@@ -40,18 +35,6 @@ const Empty = ({
           </Flex>
           <Box whiteSpace={'pre-line'}>{intro}</Box>
         </Card>
-      )}
-
-      {showChatProblem && (
-        <>
-          {/* version intro */}
-          <Card p={4} mb={10}>
-            <Markdown source={versionIntro} />
-          </Card>
-          <Card p={4}>
-            <Markdown source={chatProblem} />
-          </Card>
-        </>
       )}
     </Box>
   );

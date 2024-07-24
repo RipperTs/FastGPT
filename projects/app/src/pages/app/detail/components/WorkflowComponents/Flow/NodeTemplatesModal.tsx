@@ -206,17 +206,17 @@ const NodeTemplatesModal = ({ isOpen, onClose }: ModuleTemplateListProps) => {
                   list={[
                     {
                       icon: 'core/modules/basicNode',
-                      label: t('core.module.template.Basic Node'),
+                      label: '基础插件',
                       value: TemplateTypeEnum.basic
                     },
                     {
                       icon: 'core/modules/systemPlugin',
-                      label: t('core.module.template.System Plugin'),
+                      label: '系统插件',
                       value: TemplateTypeEnum.systemPlugin
                     },
                     {
                       icon: 'core/modules/teamPlugin',
-                      label: t('core.module.template.Team Plugin'),
+                      label: '我的插件',
                       value: TemplateTypeEnum.teamPlugin
                     }
                   ]}
@@ -252,37 +252,7 @@ const NodeTemplatesModal = ({ isOpen, onClose }: ModuleTemplateListProps) => {
                   />
                 </InputGroup>
                 <Box flex={1} />
-                {templateType === TemplateTypeEnum.teamPlugin && (
-                  <Flex
-                    alignItems={'center'}
-                    cursor={'pointer'}
-                    _hover={{
-                      color: 'primary.600'
-                    }}
-                    fontSize={'sm'}
-                    onClick={() => router.push('/app/list')}
-                    gap={1}
-                  >
-                    <Box>去创建</Box>
-                    <MyIcon name={'common/rightArrowLight'} w={'0.8rem'} />
-                  </Flex>
-                )}
-                {templateType === TemplateTypeEnum.systemPlugin &&
-                  feConfigs.systemPluginCourseUrl && (
-                    <Flex
-                      alignItems={'center'}
-                      cursor={'pointer'}
-                      _hover={{
-                        color: 'primary.600'
-                      }}
-                      fontSize={'sm'}
-                      onClick={() => window.open(feConfigs.systemPluginCourseUrl)}
-                      gap={1}
-                    >
-                      <Box>贡献插件</Box>
-                      <MyIcon name={'common/rightArrowLight'} w={'0.8rem'} />
-                    </Flex>
-                  )}
+                {/* 系统插件菜单列表 */}
               </Flex>
             )}
             {/* paths */}
@@ -436,6 +406,7 @@ const RenderList = React.memo(function RenderList({
               )}
 
               <>
+                {/*插件列表渲染*/}
                 {item.list.map((template) => (
                   <MyTooltip
                     key={template.id}
@@ -507,11 +478,6 @@ const RenderList = React.memo(function RenderList({
                       >
                         {t(template.name as any)}
                       </Box>
-                      {template.author !== undefined && (
-                        <Box fontSize={'xs'} color={'myGray.500'}>
-                          {`by ${template.author || feConfigs.systemTitle}`}
-                        </Box>
-                      )}
                     </Flex>
                   </MyTooltip>
                 ))}

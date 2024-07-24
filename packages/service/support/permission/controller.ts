@@ -138,7 +138,7 @@ export async function parseHeaderCert({
       return Promise.reject(ERROR_ENUM.unAuthorization);
     }
 
-    // Bearer fastgpt-xxxx-appId
+    // Bearer ak-xxxx-appId
     const auth = authorization.split(' ')[1];
     if (!auth) {
       return Promise.reject(ERROR_ENUM.unAuthorization);

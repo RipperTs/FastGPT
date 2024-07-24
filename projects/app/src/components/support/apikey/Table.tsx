@@ -98,17 +98,6 @@ const ApiKeyTable = ({ tips, appId }: { tips: string; appId?: string }) => {
             <Box color={'myGray.900'} fontSize={'lg'}>
               {t('common:support.openapi.Api manager')}
             </Box>
-            {feConfigs?.docUrl && (
-              <Link
-                href={feConfigs.openAPIDocUrl || getDocPath('/docs/development/openapi')}
-                target={'_blank'}
-                ml={1}
-                color={'primary.500'}
-                fontSize={'sm'}
-              >
-                {t('common:common.Read document')}
-              </Link>
-            )}
           </Flex>
           <Box fontSize={'mini'} color={'myGray.600'}>
             {tips}
@@ -153,7 +142,6 @@ const ApiKeyTable = ({ tips, appId }: { tips: string; appId?: string }) => {
             <Tr>
               <Th>{t('common:Name')}</Th>
               <Th>Api Key</Th>
-              <Th>{t('common:support.outlink.Usage points')}</Th>
               {feConfigs?.isPlus && (
                 <>
                   <Th>{t('common:common.Expired Time')}</Th>
@@ -170,12 +158,7 @@ const ApiKeyTable = ({ tips, appId }: { tips: string; appId?: string }) => {
               <Tr key={_id}>
                 <Td>{name}</Td>
                 <Td>{apiKey}</Td>
-                <Td>
-                  {Math.round(usagePoints)}/
-                  {feConfigs?.isPlus && limit?.maxUsagePoints && limit?.maxUsagePoints > -1
-                    ? `${limit?.maxUsagePoints}`
-                    : t('common:common.Unlimited')}
-                </Td>
+
                 {feConfigs?.isPlus && (
                   <>
                     <Td whiteSpace={'pre-wrap'}>

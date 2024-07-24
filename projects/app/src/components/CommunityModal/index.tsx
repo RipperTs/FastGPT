@@ -9,24 +9,7 @@ const CommunityModal = ({ onClose }: { onClose: () => void }) => {
   const { t } = useTranslation();
   const { feConfigs } = useSystemStore();
 
-  return (
-    <MyModal
-      isOpen={true}
-      onClose={onClose}
-      iconSrc="modal/concat"
-      title={t('common:system.Concat us')}
-    >
-      <ModalBody textAlign={'center'}>
-        <Markdown source={feConfigs?.concatMd || ''} />
-      </ModalBody>
-
-      <ModalFooter>
-        <Button variant={'whiteBase'} onClick={onClose}>
-          关闭
-        </Button>
-      </ModalFooter>
-    </MyModal>
-  );
+  return <></>;
 };
 
 export default CommunityModal;

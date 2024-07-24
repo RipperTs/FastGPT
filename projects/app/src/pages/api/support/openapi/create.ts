@@ -40,7 +40,7 @@ async function handler(req: ApiRequestProps<EditApiKeyProps>): Promise<string> {
   }
 
   const nanoid = getNanoid(Math.floor(Math.random() * 14) + 52);
-  const apiKey = `${global.systemEnv?.openapiPrefix || 'fastgpt'}-${nanoid}`;
+  const apiKey = `${global.systemEnv?.openapiPrefix || 'ak'}-${nanoid}`;
 
   await MongoOpenApi.create({
     teamId,
