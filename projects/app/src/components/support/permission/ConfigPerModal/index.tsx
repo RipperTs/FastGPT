@@ -86,9 +86,7 @@ const ConfigPerModal = ({
                       flexDirection="row"
                       justifyContent="space-between"
                       w="full"
-                    >
-
-                    </Flex>
+                    ></Flex>
                     <MemberListCard mt={2} p={1.5} bg="myGray.100" borderRadius="md" />
                   </>
                 );

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { useTranslation } from 'next-i18next';
 import { useForm } from 'react-hook-form';
-import {Box, Textarea} from '@chakra-ui/react';
+import { Box, Textarea } from '@chakra-ui/react';
 import { useContextSelector } from 'use-context-selector';
 import { DatasetImportContext } from '../Context';
 import { DatasetPageContext } from '@/web/core/dataset/context/datasetPageContext';
