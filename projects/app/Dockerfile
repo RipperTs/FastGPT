@@ -5,7 +5,7 @@ WORKDIR /app
 ARG proxy
 
 RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
-RUN apk add --no-cache libc6-compat && npm install -g pnpm@8.6.0
+RUN apk add --no-cache libc6-compat && npm install -g pnpm@latest
 # if proxy exists, set proxy
 RUN [ -z "$proxy" ] || pnpm config set registry https://registry.npmmirror.com
 
@@ -33,7 +33,7 @@ COPY --from=mainDeps /app/projects/app/node_modules ./projects/app/node_modules
 
 RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
-RUN apk add --no-cache libc6-compat && npm install -g pnpm@8.6.0
+RUN apk add --no-cache libc6-compat && npm install -g pnpm@latest
 
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN pnpm --filter=app build
