@@ -23,7 +23,7 @@ const Tools = () => {
           {
             icon: 'common/gitLight',
             label: 'GitHub 地址',
-            link: 'https://github.com/labring/FastGPT'
+            link: ''
           }
         ]
       : []),

@@ -6,7 +6,6 @@ import { postLogin } from '@/web/support/user/api';
 import type { ResLogin } from '@/global/support/api/userRes';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import { useSystemStore } from '@/web/common/system/useSystemStore';
-import { getDocPath } from '@/web/common/system/doc';
 import { useTranslation } from 'next-i18next';
 import FormLayout from './components/FormLayout';
 
@@ -106,27 +105,6 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
             })}
           ></Input>
         </FormControl>
-        {feConfigs?.docUrl && (
-          <Flex alignItems={'center'} mt={7} fontSize={'sm'}>
-            {t('common:support.user.login.Policy tip')}
-            <Link
-              ml={1}
-              href={getDocPath('/docs/agreement/terms/')}
-              target={'_blank'}
-              color={'primary.500'}
-            >
-              {t('common:support.user.login.Terms')}
-            </Link>
-            <Box mx={1}>{t('common:support.user.login.And')}</Box>
-            <Link
-              href={getDocPath('/docs/agreement/privacy/')}
-              target={'_blank'}
-              color={'primary.500'}
-            >
-              {t('common:support.user.login.Privacy')}
-            </Link>
-          </Flex>
-        )}
 
         <Button
           type="submit"

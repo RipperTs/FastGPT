@@ -8,10 +8,8 @@ import { clearToken, setToken } from '@/web/support/user/auth';
 import { oauthLogin } from '@/web/support/user/api';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import Loading from '@fastgpt/web/components/common/MyLoading';
-import { serviceSideProps } from '@/web/common/utils/i18n';
 import { getErrText } from '@fastgpt/global/common/error/utils';
 import { useTranslation } from 'next-i18next';
-import { useMount } from 'ahooks';
 
 const provider = () => {
   const { t } = useTranslation();

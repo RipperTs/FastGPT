@@ -62,7 +62,7 @@ const defaultFeConfigs: FastGPTFeConfigsType = {
   docUrl: 'https://doc.fastgpt.in',
   openAPIDocUrl: 'https://doc.fastgpt.in/docs/development/openapi',
   systemPluginCourseUrl: 'https://fael3z0zfze.feishu.cn/wiki/ERZnw9R26iRRG0kXZRec6WL9nwh',
-  systemTitle: 'FastGPT',
+  systemTitle: 'EasyGPTs',
   concatMd:
     '项目开源地址: [FastGPT GitHub](https://github.com/labring/FastGPT)\n交流群: ![](https://oss.laf.run/htr4n1-images/fastgpt-qr-code.jpg)',
   limit: {

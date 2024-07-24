@@ -1,11 +1,11 @@
 # --------- install dependence -----------
-FROM node:20.14.0-alpine AS mainDeps
+FROM registry.cn-hangzhou.aliyuncs.com/ripper/node:18.17-alpine AS mainDeps
 WORKDIR /app
 
 ARG proxy
 
-RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
-RUN apk add --no-cache libc6-compat && npm install -g pnpm@9.4.0
+RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+RUN apk add --no-cache libc6-compat && npm install -g pnpm@8.6.0
 # if proxy exists, set proxy
 RUN [ -z "$proxy" ] || pnpm config set registry https://registry.npmmirror.com
 
@@ -19,7 +19,7 @@ RUN [ -f pnpm-lock.yaml ] || (echo "Lockfile not found." && exit 1)
 RUN pnpm i
 
 # --------- builder -----------
-FROM node:20.14.0-alpine AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/ripper/node:18.17-alpine AS builder
 WORKDIR /app
 
 ARG proxy
@@ -31,15 +31,15 @@ COPY --from=mainDeps /app/packages ./packages
 COPY ./projects/app ./projects/app
 COPY --from=mainDeps /app/projects/app/node_modules ./projects/app/node_modules
 
-RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
-RUN apk add --no-cache libc6-compat && npm install -g pnpm@9.4.0
+RUN apk add --no-cache libc6-compat && npm install -g pnpm@8.6.0
 
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN pnpm --filter=app build
 
 # --------- runner -----------
-FROM node:20.14.0-alpine AS runner
+FROM registry.cn-hangzhou.aliyuncs.com/ripper/node:18.17-alpine AS runner
 WORKDIR /app
 
 ARG proxy
@@ -48,7 +48,7 @@ ARG proxy
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN apk add --no-cache curl ca-certificates \
   && update-ca-certificates
 
@@ -69,7 +69,7 @@ COPY --from=mainDeps /app/node_modules/@zilliz/milvus2-sdk-node ./node_modules/@
 
 
 # copy package.json to version file
-COPY --from=builder /app/projects/app/package.json ./package.json 
+COPY --from=builder /app/projects/app/package.json ./package.json
 # copy config
 COPY ./projects/app/data /app/data
 
