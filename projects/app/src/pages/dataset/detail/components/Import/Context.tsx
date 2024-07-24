@@ -1,17 +1,17 @@
-import { useRouter } from 'next/router';
-import { SetStateAction, useState } from 'react';
-import { useTranslation } from 'next-i18next';
-import { createContext, useContextSelector } from 'use-context-selector';
-import { ImportDataSourceEnum, TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
-import { useMyStep } from '@fastgpt/web/hooks/useStep';
-import { Box, Button, Flex, IconButton } from '@chakra-ui/react';
+import {useRouter} from 'next/router';
+import {SetStateAction, useState} from 'react';
+import {useTranslation} from 'next-i18next';
+import {createContext, useContextSelector} from 'use-context-selector';
+import {ImportDataSourceEnum, TrainingModeEnum} from '@fastgpt/global/core/dataset/constants';
+import {useMyStep} from '@fastgpt/web/hooks/useStep';
+import {Box, Button, Flex, IconButton} from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
-import { TabEnum } from '../Slider';
-import { ImportProcessWayEnum } from '@/web/core/dataset/constants';
-import { UseFormReturn, useForm } from 'react-hook-form';
-import { ImportSourceItemType } from '@/web/core/dataset/type';
-import { Prompt_AgentQA } from '@fastgpt/global/core/ai/prompt/agent';
-import { DatasetPageContext } from '@/web/core/dataset/context/datasetPageContext';
+import {TabEnum} from '../Slider';
+import {ImportProcessWayEnum} from '@/web/core/dataset/constants';
+import {useForm, UseFormReturn} from 'react-hook-form';
+import {ImportSourceItemType} from '@/web/core/dataset/type';
+import {Prompt_AgentQA} from '@fastgpt/global/core/ai/prompt/agent';
+import {DatasetPageContext} from '@/web/core/dataset/context/datasetPageContext';
 
 type TrainingFiledType = {
   chunkOverlapRatio: number;
@@ -73,10 +73,10 @@ export const DatasetImportContext = createContext<DatasetImportContextType>({
   priceTip: ''
 });
 
-const DatasetImportContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const { t } = useTranslation();
+const DatasetImportContextProvider = ({children}: { children: React.ReactNode }) => {
+  const {t} = useTranslation();
   const router = useRouter();
-  const { source = ImportDataSourceEnum.fileLocal, parentId } = (router.query || {}) as {
+  const {source = ImportDataSourceEnum.fileLocal, parentId} = (router.query || {}) as {
     source: ImportDataSourceEnum;
     parentId?: string;
   };
@@ -139,10 +139,21 @@ const DatasetImportContextProvider = ({ children }: { children: React.ReactNode 
       {
         title: t('common:core.dataset.import.Upload data')
       }
+    ],
+    [ImportDataSourceEnum.apiData]: [
+      {
+        title: '保存API'
+      },
+      {
+        title: '获取API KEY'
+      },
+      {
+        title: '完成'
+      }
     ]
   };
   const steps = modeSteps[source];
-  const { activeStep, goToNext, goToPrevious, MyStep } = useMyStep({
+  const {activeStep, goToNext, goToPrevious, MyStep} = useMyStep({
     defaultStep: 0,
     steps
   });
@@ -249,7 +260,7 @@ const DatasetImportContextProvider = ({ children }: { children: React.ReactNode 
         {activeStep === 0 ? (
           <Flex alignItems={'center'}>
             <IconButton
-              icon={<MyIcon name={'common/backFill'} w={'14px'} />}
+              icon={<MyIcon name={'common/backFill'} w={'14px'}/>}
               aria-label={''}
               size={'smSquare'}
               w={'26px'}
@@ -271,29 +282,33 @@ const DatasetImportContextProvider = ({ children }: { children: React.ReactNode 
         ) : (
           <Button
             variant={'whiteBase'}
-            leftIcon={<MyIcon name={'common/backFill'} w={'14px'} />}
+            leftIcon={<MyIcon name={'common/backFill'} w={'14px'}/>}
             onClick={goToPrevious}
           >
             {t('common:common.Last Step')}
           </Button>
         )}
-        <Box flex={1} />
+        <Box flex={1}/>
       </Flex>
-      {/* step */}
-      <Box
-        mt={4}
-        mb={5}
-        px={3}
-        py={[2, 4]}
-        bg={'myGray.50'}
-        borderWidth={'1px'}
-        borderColor={'borderColor.low'}
-        borderRadius={'md'}
-      >
-        <Box maxW={['100%', '900px']} mx={'auto'}>
-          <MyStep />
-        </Box>
-      </Box>
+      {source !== 'apiData' && (
+        <>
+          {/* step */}
+          <Box
+            mt={4}
+            mb={5}
+            px={3}
+            py={[2, 4]}
+            bg={'myGray.50'}
+            borderWidth={'1px'}
+            borderColor={'borderColor.low'}
+            borderRadius={'md'}
+          >
+            <Box maxW={['100%', '900px']} mx={'auto'}>
+              <MyStep/>
+            </Box>
+          </Box>
+        </>
+      )}
       {children}
     </DatasetImportContext.Provider>
   );

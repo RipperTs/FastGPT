@@ -48,7 +48,8 @@ export enum DatasetCollectionTypeEnum {
 
   file = 'file',
   link = 'link', // one link
-  externalFile = 'externalFile'
+  externalFile = 'externalFile',
+  apiData = 'apiData'
 }
 export const DatasetCollectionTypeMap = {
   [DatasetCollectionTypeEnum.folder]: {
@@ -65,6 +66,9 @@ export const DatasetCollectionTypeMap = {
   },
   [DatasetCollectionTypeEnum.virtual]: {
     name: 'core.dataset.Manual collection'
+  },
+  [DatasetCollectionTypeEnum.apiData]: {
+    name: 'core.dataset.ApiData collection'
   }
 };
 
@@ -89,7 +93,8 @@ export enum ImportDataSourceEnum {
   fileLink = 'fileLink',
   fileCustom = 'fileCustom',
   csvTable = 'csvTable',
-  externalFile = 'externalFile'
+  externalFile = 'externalFile',
+  apiData = 'apiData'
 }
 
 export enum TrainingModeEnum {

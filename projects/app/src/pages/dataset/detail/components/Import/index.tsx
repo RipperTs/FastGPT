@@ -9,6 +9,7 @@ const FileLocal = dynamic(() => import('./diffSource/FileLocal'));
 const FileLink = dynamic(() => import('./diffSource/FileLink'));
 const FileCustomText = dynamic(() => import('./diffSource/FileCustomText'));
 const TableLocal = dynamic(() => import('./diffSource/TableLocal'));
+const ApiDataText = dynamic(() => import('./diffSource/ApiDataText'));
 const ExternalFileCollection = dynamic(() => import('./diffSource/ExternalFile'));
 
 const ImportDataset = () => {
@@ -18,6 +19,7 @@ const ImportDataset = () => {
     if (importSource === ImportDataSourceEnum.fileLocal) return FileLocal;
     if (importSource === ImportDataSourceEnum.fileLink) return FileLink;
     if (importSource === ImportDataSourceEnum.fileCustom) return FileCustomText;
+    if (importSource === ImportDataSourceEnum.apiData) return ApiDataText;
     if (importSource === ImportDataSourceEnum.csvTable) return TableLocal;
     if (importSource === ImportDataSourceEnum.externalFile) return ExternalFileCollection;
   }, [importSource]);

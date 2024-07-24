@@ -90,6 +90,8 @@ export const postCreateDatasetLinkCollection = (data: LinkCreateDatasetCollectio
   POST<{ collectionId: string }>(`/core/dataset/collection/create/link`, data);
 export const postCreateDatasetTextCollection = (data: TextCreateDatasetCollectionParams) =>
   POST<{ collectionId: string }>(`/core/dataset/collection/create/text`, data);
+export const postCreateDatasetApiDataCollection = (data: TextCreateDatasetCollectionParams) =>
+  POST<{ collectionId: string }>(`/core/dataset/collection/create/apiData`, data);
 export const postCreateDatasetCsvTableCollection = (data: CsvTableCreateDatasetCollectionParams) =>
   POST<{ collectionId: string }>(`/core/dataset/collection/create/csvTable`, data, {
     timeout: 120000

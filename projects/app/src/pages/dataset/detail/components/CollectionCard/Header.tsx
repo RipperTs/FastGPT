@@ -267,6 +267,22 @@ const Header = ({}: {}) => {
                             source: ImportDataSourceEnum.csvTable
                           }
                         })
+                    },
+                    {
+                      label: (
+                        <Flex>
+                          <MyIcon name={'support/outlink/apikeyFill'} mr={2} w={'20px'} />
+                          开放API接口
+                        </Flex>
+                      ),
+                      onClick: () =>
+                        router.replace({
+                          query: {
+                            ...router.query,
+                            currentTab: TabEnum.import,
+                            source: ImportDataSourceEnum.apiData
+                          }
+                        })
                     }
                   ]
                 }

@@ -15,6 +15,9 @@ export function getCollectionIcon(
   if (type === DatasetCollectionTypeEnum.virtual) {
     return 'file/fill/manual';
   }
+  if (type === DatasetCollectionTypeEnum.apiData) {
+    return 'file/fill/manual';
+  }
   return getFileIcon(name);
 }
 export function getSourceNameIcon({
