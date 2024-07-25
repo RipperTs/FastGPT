@@ -19,7 +19,6 @@ import { RunPluginModule } from './system/runPlugin';
 import { AiQueryExtension } from './system/queryExtension';
 
 import type { FlowNodeTemplateType } from '../type/node';
-import { LafModule } from './system/laf';
 import { IfElseNode } from './system/ifElse/index';
 import { VariableUpdateNode } from './system/variableUpdate';
 import { CodeNode } from './system/sandbox';
@@ -38,7 +37,6 @@ const systemNodes: FlowNodeTemplateType[] = [
   ContextExtractModule,
   HttpNode468,
   AiQueryExtension,
-  LafModule,
   IfElseNode,
   VariableUpdateNode,
   CodeNode,
