@@ -68,7 +68,7 @@ const AppCard = () => {
 
   return (
     <>
-      {/* basic info */}
+      {/* 应用信息展示 */}
       <Box px={[4, 6]} py={4} position={'relative'}>
         <Flex alignItems={'center'}>
           <Avatar src={appDetail.avatar} borderRadius={'md'} w={'28px'} />
@@ -148,16 +148,6 @@ const AppCard = () => {
                 }
               ]}
             />
-          )}
-          <Box flex={1} />
-          {isPc && (
-            <MyTag
-              type="borderFill"
-              colorSchema="gray"
-              onClick={() => (appDetail.permission.hasManagePer ? onOpenInfoEdit() : undefined)}
-            >
-              <PermissionIconText defaultPermission={appDetail.defaultPermission} />
-            </MyTag>
           )}
         </HStack>
       </Box>

@@ -241,7 +241,7 @@ const Info = ({ datasetId }: { datasetId: string }) => {
       </Flex>
       <Flex mt={8} w={'100%'} alignItems={'center'}>
         <FormLabel flex={['0 0 90px', '0 0 160px']} w={0}>
-          {t('common:core.dataset.Name')}
+          知识库名称
         </FormLabel>
         <Input flex={[1, '0 0 320px']} maxLength={30} {...register('name')} />
       </Flex>
@@ -253,49 +253,6 @@ const Info = ({ datasetId }: { datasetId: string }) => {
           placeholder={t('common:common.Intro')}
         />
       </Flex>
-
-      {datasetDetail.permission.hasManagePer && (
-        <>
-          <MyDivider my={6} h={'2px'} maxW={'500px'} />
-
-          <Flex mt={5} alignItems={'center'} w={'100%'} flexWrap={'wrap'} maxW="500px">
-            <FormLabel flex={['0 0 90px', '0 0 160px']} w={0}>
-              {commonT('permission.Default permission')}
-            </FormLabel>
-            <DefaultPermissionList
-              w="320px"
-              per={defaultPermission}
-              defaultPer={DatasetDefaultPermissionVal}
-              onChange={(v) => setValue('defaultPermission', v)}
-            />
-          </Flex>
-
-          <Flex mt={5} alignItems={'center'} w={'100%'} flexWrap={'wrap'} maxW="500px">
-            <FormLabel flex={['0 0 90px', '0 0 160px']} w={0}>
-              {commonT('permission.Collaborator')}
-            </FormLabel>
-            <Box flex={1}>
-              <MemberManager
-                managePer={{
-                  permission: datasetDetail.permission,
-                  onGetCollaboratorList: () => getCollaboratorList(datasetId),
-                  permissionList: DatasetPermissionList,
-                  onUpdateCollaborators: (body) =>
-                    postUpdateDatasetCollaborators({
-                      ...body,
-                      datasetId
-                    }),
-                  onDelOneCollaborator: (tmbId) =>
-                    deleteDatasetCollaborators({
-                      datasetId,
-                      tmbId
-                    })
-                }}
-              />
-            </Box>
-          </Flex>
-        </>
-      )}
 
       <Flex mt={5} w={'100%'} alignItems={'flex-end'}>
         <Box flex={['0 0 90px', '0 0 160px']} w={0}></Box>

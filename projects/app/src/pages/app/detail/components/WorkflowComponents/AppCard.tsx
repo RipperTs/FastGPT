@@ -82,11 +82,6 @@ const AppCard = ({ showSaveStatus }: { showSaveStatus: boolean }) => {
                   icon: 'edit',
                   label: appT('edit_info'),
                   onClick: onOpenInfoEdit
-                },
-                {
-                  icon: 'support/team/key',
-                  label: t('common:common.Role'),
-                  onClick: onOpenInfoEdit
                 }
               ]
             },

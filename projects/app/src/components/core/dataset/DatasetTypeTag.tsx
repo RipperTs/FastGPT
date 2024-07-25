@@ -23,7 +23,7 @@ const DatasetTypeTag = ({ type, ...props }: { type: DatasetTypeEnum } & FlexProp
     >
       <MyIcon name={item.icon as any} w={'16px'} mr={2} color={'myGray.400'} />
       {/* @ts-ignore */}
-      <Box>{datasetT(item.label)}</Box>
+      <Box mt={0.5}>{datasetT(item.label)}</Box>
     </Flex>
   );
 };

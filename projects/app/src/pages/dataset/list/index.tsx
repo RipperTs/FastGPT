@@ -100,7 +100,7 @@ const Dataset = () => {
                   <Button variant={'primary'} px="0">
                     <Flex alignItems={'center'} px={'20px'}>
                       <AddIcon mr={2} />
-                      <Box>{t('common:common.Create New')}</Box>
+                      <Box>新建</Box>
                     </Flex>
                   </Button>
                 }
@@ -132,10 +132,12 @@ const Dataset = () => {
             )}
           </Flex>
           <Box flexGrow={1}>
+            {/*数据列表*/}
             <List />
           </Box>
         </Flex>
 
+        {/*文件夹*/}
         {!!folderDetail && isPc && (
           <Box ml="6">
             <FolderSlideCard
@@ -199,6 +201,7 @@ const Dataset = () => {
         )}
       </Flex>
 
+      {/*编辑文件夹数据*/}
       {!!editFolderData && (
         <EditFolderModal
           onClose={() => setEditFolderData(undefined)}

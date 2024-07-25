@@ -35,7 +35,7 @@ import { useFolderDrag } from '@/components/common/folder/useFolderDrag';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import { useI18n } from '@/web/context/I18n';
 import { useTranslation } from 'react-i18next';
-
+// 知识库列表数据展示
 function List() {
   const { setLoading } = useSystemStore();
   const { toast } = useToast();
@@ -242,7 +242,7 @@ function List() {
                           children: [
                             {
                               icon: 'edit',
-                              label: commonT('dataset.Edit Info'),
+                              label: '编辑',
                               onClick: () =>
                                 setEditedDataset({
                                   id: dataset._id,
@@ -255,16 +255,7 @@ function List() {
                               icon: 'common/file/move',
                               label: t('common:Move'),
                               onClick: () => setMoveDatasetId(dataset._id)
-                            },
-                            ...(dataset.permission.hasManagePer
-                              ? [
-                                  {
-                                    icon: 'support/team/key',
-                                    label: t('common:permission.Permission'),
-                                    onClick: () => setEditPerDatasetIndex(index)
-                                  }
-                                ]
-                              : [])
+                            }
                           ]
                         },
                         ...(dataset.type != DatasetTypeEnum.folder
@@ -321,12 +312,6 @@ function List() {
                       : t('common:core.dataset.Intro Placeholder'))}
                 </Box>
                 <Flex alignItems={'center'} fontSize={'sm'}>
-                  <Box flex={1}>
-                    <PermissionIconText
-                      defaultPermission={dataset.defaultPermission}
-                      color={'myGray.600'}
-                    />
-                  </Box>
                   {dataset.type !== DatasetTypeEnum.folder && (
                     <DatasetTypeTag type={dataset.type} py={1} px={2} />
                   )}
