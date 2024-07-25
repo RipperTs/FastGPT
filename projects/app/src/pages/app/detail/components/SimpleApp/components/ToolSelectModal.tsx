@@ -233,7 +233,6 @@ const RenderList = React.memo(function RenderList({
                 <Box mt={2} color={'myGray.500'}>
                   {t(item.intro as any) || t('common:core.workflow.Not intro')}
                 </Box>
-                {showCost && <CostTooltip cost={item.currentCost} />}
               </Box>
             }
           >
