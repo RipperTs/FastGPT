@@ -253,11 +253,6 @@ const RenderList = React.memo(function RenderList({
               <Box ml={3} flex={'1 0 0'} color={'myGray.900'}>
                 {t(item.name as any)}
               </Box>
-              {item.author !== undefined && (
-                <Box fontSize={'xs'} mr={3}>
-                  {`by ${item.author || feConfigs.systemTitle}`}
-                </Box>
-              )}
               {selected ? (
                 <Button
                   size={'sm'}
