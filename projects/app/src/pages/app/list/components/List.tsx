@@ -229,12 +229,6 @@ const ListItem = () => {
                       </HStack>
                     )}
 
-                    <PermissionIconText
-                      defaultPermission={app.defaultPermission}
-                      color={'myGray.500'}
-                      iconColor={'myGray.400'}
-                      w={'0.875rem'}
-                    />
                   </HStack>
 
                   <HStack>
@@ -290,7 +284,7 @@ const ListItem = () => {
                               children: [
                                 {
                                   icon: 'edit',
-                                  label: '编辑信息',
+                                  label: '编辑',
                                   onClick: () => {
                                     if (app.type === AppTypeEnum.httpPlugin) {
                                       setEditHttpPlugin({
@@ -315,19 +309,10 @@ const ListItem = () => {
                                   : [
                                       {
                                         icon: 'common/file/move',
-                                        label: t('common:common.folder.Move to'),
+                                        label: '移动',
                                         onClick: () => setMoveAppId(app._id)
                                       }
-                                    ]),
-                                ...(app.permission.hasManagePer
-                                  ? [
-                                      {
-                                        icon: 'support/team/key',
-                                        label: t('common:permission.Permission'),
-                                        onClick: () => setEditPerAppIndex(index)
-                                      }
-                                    ]
-                                  : [])
+                                    ])
                               ]
                             },
                             ...(AppFolderTypeList.includes(app.type)

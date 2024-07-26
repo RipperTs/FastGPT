@@ -80,7 +80,7 @@ const Dataset = () => {
                 <Flex flex={1} alignItems={'center'}>
                   <Image src={'/imgs/workflow/db.png'} alt={''} mr={2} h={'24px'} />
                   <Box className="textlg" letterSpacing={1} fontSize={'24px'} fontWeight={'bold'}>
-                    {t('common:core.dataset.My Dataset')}
+                    知识库
                   </Box>
                 </Flex>
               }

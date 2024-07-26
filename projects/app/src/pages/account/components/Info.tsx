@@ -5,11 +5,6 @@ import {
   Button,
   useDisclosure,
   useTheme,
-  Input,
-  Link,
-  Progress,
-  Grid,
-  Image,
   BoxProps
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
@@ -27,33 +22,20 @@ import Avatar from '@fastgpt/web/components/common/Avatar';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
 import { useRouter } from 'next/router';
-import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
-import { putUpdateMemberName } from '@/web/support/user/team/api';
-import { getDocPath } from '@/web/common/system/doc';
 import { MongoImageTypeEnum } from '@fastgpt/global/common/file/image/constants';
 import {
   StandardSubLevelEnum,
   standardSubLevelMap
 } from '@fastgpt/global/support/wallet/sub/constants';
-import { formatTime2YMD } from '@fastgpt/global/common/string/time';
 import {
   AI_POINT_USAGE_CARD_ROUTE,
-  EXTRA_PLAN_CARD_ROUTE
 } from '@/web/support/wallet/sub/constants';
 
-import StandardPlanContentList from '@/components/support/wallet/StandardPlanContentList';
-import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
-import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 const StandDetailModal = dynamic(() => import('./standardDetailModal'));
-const TeamMenu = dynamic(() => import('@/components/support/user/team/TeamMenu'));
 const PayModal = dynamic(() => import('./PayModal'));
 const UpdatePswModal = dynamic(() => import('./UpdatePswModal'));
-const OpenAIAccountModal = dynamic(() => import('./OpenAIAccountModal'));
-const LafAccountModal = dynamic(() => import('@/components/support/laf/LafAccountModal'));
-const CommunityModal = dynamic(() => import('@/components/CommunityModal'));
-
 const Account = () => {
   const { isPc } = useSystem();
   const { teamPlanStatus } = useUserStore();
@@ -232,7 +214,7 @@ const MyInfo = () => {
         </Flex>
         <Flex alignItems={'center'} mt={6}>
           <Box {...labelStyles}>密码:&nbsp;</Box>
-          <Box flex={1}>xxx</Box>
+          <Box flex={1}>123456</Box>
         </Flex>
         {feConfigs.isPlus && (
           <Flex mt={6} alignItems={'center'}>
