@@ -12,6 +12,7 @@ async function handler(req: NextApiRequest) {
   const {
     parentId,
     name,
+    intro,
     type = DatasetTypeEnum.dataset,
     avatar,
     vectorModel = global.vectorModels[0].model,
@@ -39,6 +40,7 @@ async function handler(req: NextApiRequest) {
 
   const { _id } = await MongoDataset.create({
     name,
+    intro,
     teamId,
     tmbId,
     vectorModel,
