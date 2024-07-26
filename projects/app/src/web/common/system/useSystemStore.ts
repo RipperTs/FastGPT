@@ -16,6 +16,7 @@ import { SubPlanType } from '@fastgpt/global/support/wallet/sub/type';
 
 type LoginStoreType = { provider: `${OAuthEnum}`; lastRoute: string; state: string };
 
+// 全局状态管理
 type State = {
   initd: boolean;
   setInitd: () => void;
