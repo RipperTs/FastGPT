@@ -128,35 +128,39 @@ const SliderApps = ({ apps, activeAppId }: { apps: AppListItemType[]; activeAppI
         </>
       )}
 
+      {/*最近使用app*/}
       <Box flex={'1 0 0'} px={4} h={0} overflow={'overlay'}>
         {apps.map((item) => (
-          <Flex
-            key={item._id}
-            py={2}
-            px={3}
-            mb={3}
-            cursor={'pointer'}
-            borderRadius={'md'}
-            alignItems={'center'}
-            fontSize={'sm'}
-            {...(item._id === activeAppId
-              ? {
+          // 仅展示简单应用和工作流
+          (item.type === AppTypeEnum.simple || item.type === AppTypeEnum.workflow) ? (
+            <Flex
+              key={item._id}
+              py={2}
+              px={3}
+              mb={3}
+              cursor={'pointer'}
+              borderRadius={'md'}
+              alignItems={'center'}
+              fontSize={'sm'}
+              {...(item._id === activeAppId
+                ? {
                   bg: 'white',
                   boxShadow: 'md',
                   color: 'primary.600'
                 }
-              : {
+                : {
                   _hover: {
                     bg: 'myGray.200'
                   },
                   onClick: () => onChangeApp(item._id)
                 })}
-          >
-            <Avatar src={item.avatar} w={'1.5rem'} borderRadius={'md'} />
-            <Box ml={2} className={'textEllipsis'}>
-              {item.name}
-            </Box>
-          </Flex>
+            >
+              <Avatar src={item.avatar} w={'1.5rem'} borderRadius={'md'} />
+              <Box ml={2} className={'textEllipsis'}>
+                {item.name}
+              </Box>
+            </Flex>
+          ) : null
         ))}
       </Box>
     </Flex>
