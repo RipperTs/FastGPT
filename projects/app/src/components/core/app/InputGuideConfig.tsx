@@ -143,20 +143,12 @@ const InputGuideConfig = ({
               <>
                 <Flex mt={8} alignItems={'center'}>
                   <FormLabel>{chatT('custom_input_guide_url')}</FormLabel>
-                  <Flex
-                    onClick={() => window.open(getDocPath('/docs/course/chat_input_guide'))}
-                    color={'primary.700'}
-                    alignItems={'center'}
-                    cursor={'pointer'}
-                  >
-                    <MyIcon name={'book'} ml={4} mr={1} />
-                    {commonT('common.Documents')}
-                  </Flex>
                   <Box flex={'1 0 0'} />
                 </Flex>
                 <Textarea
                   mt={2}
                   bg={'myGray.50'}
+                  placeholder={'返回参数data数组中每一字符串表示一个推荐引导语'}
                   defaultValue={value.customUrl}
                   onBlur={(e) =>
                     onChange({
