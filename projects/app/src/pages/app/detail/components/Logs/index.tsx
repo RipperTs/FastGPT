@@ -79,16 +79,8 @@ const Logs = () => {
               {appT('chat_logs')}
             </Box>
             <Box color={'myGray.500'} fontSize={'sm'}>
-              {appT('chat_logs_tips')},{' '}
-              <Box
-                as={'span'}
-                mr={2}
-                textDecoration={'underline'}
-                cursor={'pointer'}
-                onClick={onOpenMarkDesc}
-              >
-                {t('common:core.chat.Read Mark Description')}
-              </Box>
+              <Box>{`日志会记录该应对的所有对话记录, 无论是通过分享或API形式的对话记录, 分享链接添加 authToken 参数可识别对话人及保留历史记录.`}</Box>
+              <Box>{`API 需要填写 chatId 参数来实现对话记录区分, 同时需要自行实现: 工具调用动作/历史记录展示/用户反馈等.`}</Box>
             </Box>
           </>
         )}
@@ -110,6 +102,7 @@ const Logs = () => {
               <Tr>
                 <Th>{t('common:core.app.logs.Source And Time')}</Th>
                 <Th>{appT('logs_title')}</Th>
+                <Th>发送人</Th>
                 <Th>{appT('logs_message_total')}</Th>
                 <Th>{appT('feedback_count')}</Th>
                 <Th>{t('common:core.app.feedback.Custom feedback')}</Th>
@@ -131,6 +124,9 @@ const Logs = () => {
                   </Td>
                   <Td className="textEllipsis" maxW={'250px'}>
                     {item.title}
+                  </Td>
+                  <Td className="textEllipsis" maxW={'80px'}>
+                    {item.outLinkUid || '-'}
                   </Td>
                   <Td>{item.messageCount}</Td>
                   <Td w={'100px'}>

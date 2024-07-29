@@ -129,7 +129,8 @@ async function handler(
           userGoodFeedbackCount: 1,
           userBadFeedbackCount: 1,
           customFeedbacksCount: 1,
-          markCount: 1
+          markCount: 1,
+          outLinkUid: 1
         }
       }
     ]),
