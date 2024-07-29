@@ -312,6 +312,17 @@ function EditLinkModal({
             })}
           />
         </Flex>
+        <Flex alignItems={'center'} mt={4}>
+          <Flex flex={'0 0 90px'} alignItems={'center'}>
+            <FormLabel>{publishT('token_auth')}</FormLabel>
+            <QuestionTip ml={1} label="暂不支持"></QuestionTip>
+          </Flex>
+          <Input
+            placeholder={publishT('token_auth_tips') || ''}
+            fontSize={'sm'}
+            {...register('limit.hookUrl')}
+          />
+        </Flex>
         {feConfigs?.isPlus && (
           <>
             <Flex alignItems={'center'} mt={4}>
@@ -363,17 +374,6 @@ function EditLinkModal({
               />
             </Flex>
 
-            <Flex alignItems={'center'} mt={4}>
-              <Flex flex={'0 0 90px'} alignItems={'center'}>
-                <FormLabel>{publishT('token_auth')}</FormLabel>
-                <QuestionTip ml={1} label={publishT('token_auth_tips') || ''}></QuestionTip>
-              </Flex>
-              <Input
-                placeholder={publishT('token_auth_tips') || ''}
-                fontSize={'sm'}
-                {...register('limit.hookUrl')}
-              />
-            </Flex>
             <Link
               href={getDocPath('/docs/development/openapi/share')}
               target={'_blank'}

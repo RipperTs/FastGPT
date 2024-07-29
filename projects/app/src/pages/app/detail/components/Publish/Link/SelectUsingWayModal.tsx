@@ -206,6 +206,13 @@ console.log("Chat box loaded")
               }}
             />
           </Flex>
+          <Flex gridTemplateColumns={['repeat(2,1fr)', 'repeat(3,1fr)']}
+                gridGap={4}
+                mt={2}
+                ml={3}
+                fontSize={'sm'}>
+            <Box style={{color: '#3370ff'}}>Query新增参数 authToken={`<uid>`}, 可识别对话人及保留历史记录.</Box>
+          </Flex>
           <Box whiteSpace={'pre'} p={3} overflowX={'auto'}>
             {wayMap[getValues('usingWay')].code}
           </Box>

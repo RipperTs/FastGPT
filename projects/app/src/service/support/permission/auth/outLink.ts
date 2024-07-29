@@ -11,6 +11,7 @@ import { AuthUserTypeEnum } from '@fastgpt/global/support/permission/constant';
 import { OutLinkErrEnum } from '@fastgpt/global/common/error/code/outLink';
 import { OutLinkSchema } from '@fastgpt/global/support/outLink/type';
 
+// 分享链接初始化请求身份验证
 export function authOutLinkInit(data: AuthOutLinkInitProps): Promise<AuthOutLinkResponse> {
   if (!global.feConfigs?.isPlus) return Promise.resolve({ uid: data.outLinkUid });
   return POST<AuthOutLinkResponse>('/support/outLink/authInit', data);
