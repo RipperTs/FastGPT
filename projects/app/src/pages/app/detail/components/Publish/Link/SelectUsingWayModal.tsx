@@ -48,6 +48,7 @@ const SelectUsingWayModal = ({ share, onClose }: { share: OutLinkSchema; onClose
     defaultValues: {
       usingWay: UsingWayEnum.link,
       showHistory: true,
+      authToken: false,
       scriptIconCanDrag: true,
       scriptDefaultOpen: false,
       scriptOpenIcon:
@@ -74,7 +75,9 @@ const SelectUsingWayModal = ({ share, onClose }: { share: OutLinkSchema; onClose
 
   const baseUrl = feConfigs?.customSharePageDomain || location?.origin;
   // 默认分享链接地址
-  const linkUrl = `${baseUrl}/chat/share?shareId=${share?.shareId}&authToken=<uid>${
+  const linkUrl = `${baseUrl}/chat/share?shareId=${share?.shareId}${
+    getValues('authToken') ? '&authToken=<uid>' : ''
+  }${
     getValues('showHistory') ? '' : '&showHistory=0'
   }`;
 
@@ -149,6 +152,10 @@ const SelectUsingWayModal = ({ share, onClose }: { share: OutLinkSchema; onClose
           <Flex {...gridItemStyle}>
             <Box flex={1}>{t('common:core.app.outLink.Show History')}</Box>
             <Switch {...register('showHistory')} />
+          </Flex>
+          <Flex {...gridItemStyle}>
+            <Box flex={1}>用户身份识别</Box>
+            <Switch {...register('authToken')} />
           </Flex>
           {getValues('usingWay') === UsingWayEnum.script && (
             <>
