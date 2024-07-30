@@ -38,6 +38,7 @@ const ChatHeader = ({
 }) => {
   const isPlugin = chatData.app.type === AppTypeEnum.plugin;
   const { isPc } = useSystem();
+
   return (
     <>
       {isPc && isPlugin ? null : (
@@ -282,11 +283,12 @@ const PcHeader = ({
             : t('common:core.chat.History Amount', { amount: history.length })}
         </Box>
       </MyTag>
+      {/* 当前模型名称 */}
       {!!chatModels && chatModels.length > 0 && (
-        <MyTooltip label={chatModels.join(',')}>
+        <MyTooltip label="使用的 AI 模型">
           <MyTag ml={2} colorSchema={'green'}>
             <MyIcon name={'core/chat/chatModelTag'} w={'14px'} />
-            <Box ml={1} maxW={'200px'} className="textEllipsis">
+            <Box ml={1} maxW={'200px'} cursor="pointer" className="textEllipsis">
               {chatModels.join(',')}
             </Box>
           </MyTag>
