@@ -228,7 +228,6 @@ const ListItem = () => {
                         </Box>
                       </HStack>
                     )}
-
                   </HStack>
 
                   <HStack>

@@ -290,19 +290,14 @@ function EditLinkModal({
         <Flex alignItems={'center'} mt={4}>
           <Flex flex={'0 0 90px'} alignItems={'center'}>
             <FormLabel>登录地址</FormLabel>
-            <QuestionTip ml={1} label="因用户验证服务端接口固定, 目前仅支持旧版登录地址"></QuestionTip>
+            <QuestionTip
+              ml={1}
+              label="因用户验证服务端接口固定, 目前仅支持旧版登录地址"
+            ></QuestionTip>
           </Flex>
-          <Input
-            placeholder='SSO登录地址'
-            fontSize={'sm'}
-            {...register('limit.hookUrl')}
-          />
+          <Input placeholder="SSO登录地址" fontSize={'sm'} {...register('limit.hookUrl')} />
         </Flex>
-        <Flex
-          fontSize={'xs'}
-          mt={1}
-          color={'myGray.500'}
-        >
+        <Flex fontSize={'xs'} mt={1} color={'myGray.500'}>
           示例: http://10.6.1.129/login/index.html?url=
         </Flex>
         <Flex alignItems={'center'} mt={4}>
@@ -340,10 +335,7 @@ function EditLinkModal({
         <Flex alignItems={'center'} mt={4}>
           <Flex flex={'0 0 90px'} alignItems={'center'}>
             <FormLabel>返回引用</FormLabel>
-            <QuestionTip
-              ml={1}
-              label="在回复中返回引用内容, 但不会允许用户下载文档"
-            ></QuestionTip>
+            <QuestionTip ml={1} label="在回复中返回引用内容, 但不会允许用户下载文档"></QuestionTip>
           </Flex>
           <Switch {...register('responseDetail')} />
         </Flex>
@@ -351,10 +343,7 @@ function EditLinkModal({
         <Flex alignItems={'center'} mt={4}>
           <Flex flex={'0 0 90px'} alignItems={'center'}>
             <FormLabel>是否登录</FormLabel>
-            <QuestionTip
-              ml={1}
-              label="开启后请务必填写登录地址"
-            ></QuestionTip>
+            <QuestionTip ml={1} label="开启后请务必填写登录地址"></QuestionTip>
           </Flex>
           <Switch {...register('isLogin')} />
         </Flex>

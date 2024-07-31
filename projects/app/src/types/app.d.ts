@@ -13,7 +13,7 @@ import type { FlowNodeTemplateType } from '@fastgpt/global/core/workflow/type/no
 import type { ChatSchema } from '@fastgpt/global/core/chat/type';
 import type { AppSchema } from '@fastgpt/global/core/app/type';
 import { ChatModelType } from '@/constants/model';
-import {StoreEdgeItemType} from "@fastgpt/global/core/workflow/type/edge";
+import { StoreEdgeItemType } from '@fastgpt/global/core/workflow/type/edge';
 
 export interface ShareAppItem {
   _id: string;

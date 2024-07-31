@@ -1,31 +1,34 @@
-import React, {useState} from 'react';
-import {Box, Button, Flex, Image, useDisclosure} from '@chakra-ui/react';
-import {useRouter} from 'next/router';
+import React, { useState } from 'react';
+import { Box, Button, Flex, Image, useDisclosure } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import PageContainer from '@/components/PageContainer';
-import {useTranslation} from 'next-i18next';
-import {serviceSideProps} from '@/web/common/utils/i18n';
+import { useTranslation } from 'next-i18next';
+import { serviceSideProps } from '@/web/common/utils/i18n';
 import ParentPaths from '@/components/common/folder/Path';
-import {useDatasetStore} from '@/web/core/dataset/store/dataset';
+import { useDatasetStore } from '@/web/core/dataset/store/dataset';
 import List from './component/List';
-import DatasetContextProvider, {DatasetsContext} from './context';
-import {useContextSelector} from 'use-context-selector';
+import DatasetContextProvider, { DatasetsContext } from './context';
+import { useContextSelector } from 'use-context-selector';
 import MyMenu from '@fastgpt/web/components/common/MyMenu';
-import {AddIcon} from '@chakra-ui/icons';
-import {useUserStore} from '@/web/support/user/useUserStore';
+import { AddIcon } from '@chakra-ui/icons';
+import { useUserStore } from '@/web/support/user/useUserStore';
 import MyIcon from '@fastgpt/web/components/common/Icon';
-import {FolderIcon, FolderImgUrl} from '@fastgpt/global/common/file/image/constants';
-import {EditFolderFormType} from '@fastgpt/web/components/common/MyModal/EditFolderModal';
+import { FolderIcon, FolderImgUrl } from '@fastgpt/global/common/file/image/constants';
+import { EditFolderFormType } from '@fastgpt/web/components/common/MyModal/EditFolderModal';
 import dynamic from 'next/dynamic';
-import {postCreateDataset, putDatasetById} from '@/web/core/dataset/api';
-import {DatasetTypeEnum} from '@fastgpt/global/core/dataset/constants';
+import { postCreateDataset, putDatasetById } from '@/web/core/dataset/api';
+import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
 import FolderSlideCard from '@/components/common/folder/SlideCard';
-import {DatasetDefaultPermissionVal, DatasetPermissionList} from '@fastgpt/global/support/permission/dataset/constant';
+import {
+  DatasetDefaultPermissionVal,
+  DatasetPermissionList
+} from '@fastgpt/global/support/permission/dataset/constant';
 import {
   deleteDatasetCollaborators,
   getCollaboratorList,
   postUpdateDatasetCollaborators
 } from '@/web/core/dataset/api/collaborator';
-import {useSystem} from '@fastgpt/web/hooks/useSystem';
+import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 const EditFolderModal = dynamic(
   () => import('@fastgpt/web/components/common/MyModal/EditFolderModal')
@@ -34,12 +37,12 @@ const EditFolderModal = dynamic(
 const CreateModal = dynamic(() => import('./component/CreateModal'));
 
 const Dataset = () => {
-  const {isPc} = useSystem();
-  const {t} = useTranslation();
+  const { isPc } = useSystem();
+  const { t } = useTranslation();
   const router = useRouter();
-  const {parentId} = router.query as { parentId: string };
+  const { parentId } = router.query as { parentId: string };
 
-  const {myDatasets} = useDatasetStore();
+  const { myDatasets } = useDatasetStore();
 
   const {
     paths,
@@ -51,7 +54,7 @@ const Dataset = () => {
     setMoveDatasetId,
     onDelDataset
   } = useContextSelector(DatasetsContext, (v) => v);
-  const {userInfo} = useUserStore();
+  const { userInfo } = useUserStore();
 
   const [editFolderData, setEditFolderData] = useState<EditFolderFormType>();
 
@@ -64,7 +67,7 @@ const Dataset = () => {
   return (
     <PageContainer
       isLoading={myDatasets.length === 0 && isFetchingDatasets}
-      insertProps={{px: folderDetail ? [4, 6] : [5, '10']}}
+      insertProps={{ px: folderDetail ? [4, 6] : [5, '10'] }}
     >
       <Flex pt={[4, 6]}>
         <Flex flexGrow={1} flexDirection="column">
@@ -73,7 +76,7 @@ const Dataset = () => {
               paths={paths}
               FirstPathDom={
                 <Flex flex={1} alignItems={'center'}>
-                  <Image src={'/imgs/workflow/db.png'} alt={''} mr={2} h={'24px'}/>
+                  <Image src={'/imgs/workflow/db.png'} alt={''} mr={2} h={'24px'} />
                   <Box className="textlg" letterSpacing={1} fontSize={'24px'} fontWeight={'bold'}>
                     知识库
                   </Box>
@@ -94,7 +97,7 @@ const Dataset = () => {
                 Button={
                   <Button variant={'primary'} px="0">
                     <Flex alignItems={'center'} px={'20px'}>
-                      <AddIcon mr={2}/>
+                      <AddIcon mr={2} />
                       <Box>新建</Box>
                     </Flex>
                   </Button>
@@ -105,7 +108,7 @@ const Dataset = () => {
                       {
                         label: (
                           <Flex>
-                            <MyIcon name={FolderIcon} w={'20px'} mr={1}/>
+                            <MyIcon name={FolderIcon} w={'20px'} mr={1} />
                             {t('common:Folder')}
                           </Flex>
                         ),
@@ -114,7 +117,7 @@ const Dataset = () => {
                       {
                         label: (
                           <Flex>
-                            <Image src={'/imgs/workflow/db.png'} alt={''} w={'20px'} mr={1}/>
+                            <Image src={'/imgs/workflow/db.png'} alt={''} w={'20px'} mr={1} />
                             {t('common:core.dataset.Dataset')}
                           </Flex>
                         ),
@@ -128,7 +131,7 @@ const Dataset = () => {
           </Flex>
           <Box flexGrow={1}>
             {/*数据列表*/}
-            <List/>
+            <List />
           </Box>
         </Flex>
 
@@ -173,9 +176,9 @@ const Dataset = () => {
                 onGetCollaboratorList: () => getCollaboratorList(folderDetail._id),
                 permissionList: DatasetPermissionList,
                 onUpdateCollaborators: ({
-                                          tmbIds,
-                                          permission
-                                        }: {
+                  tmbIds,
+                  permission
+                }: {
                   tmbIds: string[];
                   permission: number;
                 }) => {
@@ -200,7 +203,7 @@ const Dataset = () => {
       {!!editFolderData && (
         <EditFolderModal
           onClose={() => setEditFolderData(undefined)}
-          onCreate={async ({name, intro}) => {
+          onCreate={async ({ name, intro }) => {
             try {
               await postCreateDataset({
                 parentId: parentId || undefined,
@@ -215,7 +218,7 @@ const Dataset = () => {
               return Promise.reject(error);
             }
           }}
-          onEdit={async ({name, intro, id}) => {
+          onEdit={async ({ name, intro, id }) => {
             try {
               await putDatasetById({
                 id,
@@ -231,7 +234,7 @@ const Dataset = () => {
         />
       )}
       {isOpenCreateModal && (
-        <CreateModal onClose={onCloseCreateModal} parentId={parentId || undefined}/>
+        <CreateModal onClose={onCloseCreateModal} parentId={parentId || undefined} />
       )}
     </PageContainer>
   );
@@ -248,7 +251,7 @@ export async function getServerSideProps(content: any) {
 function DatasetContextWrapper() {
   return (
     <DatasetContextProvider>
-      <Dataset/>
+      <Dataset />
     </DatasetContextProvider>
   );
 }

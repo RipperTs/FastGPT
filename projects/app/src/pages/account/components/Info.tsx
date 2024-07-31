@@ -1,12 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import {
-  Box,
-  Flex,
-  Button,
-  useDisclosure,
-  useTheme,
-  BoxProps
-} from '@chakra-ui/react';
+import { Box, Flex, Button, useDisclosure, useTheme, BoxProps } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { UserUpdateParams } from '@/types/user';
 import { useToast } from '@fastgpt/web/hooks/useToast';
@@ -27,9 +20,7 @@ import {
   StandardSubLevelEnum,
   standardSubLevelMap
 } from '@fastgpt/global/support/wallet/sub/constants';
-import {
-  AI_POINT_USAGE_CARD_ROUTE,
-} from '@/web/support/wallet/sub/constants';
+import { AI_POINT_USAGE_CARD_ROUTE } from '@/web/support/wallet/sub/constants';
 
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 

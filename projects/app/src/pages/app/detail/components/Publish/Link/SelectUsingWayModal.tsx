@@ -77,9 +77,7 @@ const SelectUsingWayModal = ({ share, onClose }: { share: OutLinkSchema; onClose
   // 默认分享链接地址
   const linkUrl = `${baseUrl}/chat/share?shareId=${share?.shareId}${
     getValues('authToken') ? '&authToken=<uid>' : ''
-  }${
-    getValues('showHistory') ? '' : '&showHistory=0'
-  }`;
+  }${getValues('showHistory') ? '' : '&showHistory=0'}`;
 
   const wayMap = {
     [UsingWayEnum.link]: {

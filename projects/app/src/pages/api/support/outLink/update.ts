@@ -13,7 +13,7 @@ export type OutLinkUpdateResponse = {};
 async function handler(
   req: ApiRequestProps<OutLinkUpdateBody, OutLinkUpdateQuery>
 ): Promise<OutLinkUpdateResponse> {
-  const { _id, name, responseDetail,isLogin, limit } = req.body;
+  const { _id, name, responseDetail, isLogin, limit } = req.body;
 
   if (!_id) {
     return Promise.reject(CommonErrEnum.missingParams);

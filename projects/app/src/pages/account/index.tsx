@@ -1,18 +1,18 @@
-import React, {useCallback} from 'react';
-import {Box, Flex, useTheme} from '@chakra-ui/react';
-import {useSystemStore} from '@/web/common/system/useSystemStore';
-import {useRouter} from 'next/router';
+import React, { useCallback } from 'react';
+import { Box, Flex, useTheme } from '@chakra-ui/react';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
+import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import {useUserStore} from '@/web/support/user/useUserStore';
-import {useConfirm} from '@fastgpt/web/hooks/useConfirm';
+import { useUserStore } from '@/web/support/user/useUserStore';
+import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
 import PageContainer from '@/components/PageContainer';
 import SideTabs from '@/components/SideTabs';
 import LightRowTabs from '@fastgpt/web/components/common/Tabs/LightRowTabs';
 import UserInfo from './components/Info';
-import {serviceSideProps} from '@/web/common/utils/i18n';
-import {useTranslation} from 'next-i18next';
+import { serviceSideProps } from '@/web/common/utils/i18n';
+import { useTranslation } from 'next-i18next';
 import Script from 'next/script';
-import {useSystem} from '@fastgpt/web/hooks/useSystem';
+import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 const Promotion = dynamic(() => import('./components/Promotion'));
 const UsageTable = dynamic(() => import('./components/UsageTable'));
@@ -32,11 +32,11 @@ enum TabEnum {
   'loginout' = 'loginout'
 }
 
-const Account = ({currentTab}: { currentTab: TabEnum }) => {
-  const {t} = useTranslation();
-  const {userInfo, setUserInfo} = useUserStore();
-  const {feConfigs, systemVersion} = useSystemStore();
-  const {isPc} = useSystem();
+const Account = ({ currentTab }: { currentTab: TabEnum }) => {
+  const { t } = useTranslation();
+  const { userInfo, setUserInfo } = useUserStore();
+  const { feConfigs, systemVersion } = useSystemStore();
+  const { isPc } = useSystem();
 
   const tabList = [
     {
@@ -46,12 +46,12 @@ const Account = ({currentTab}: { currentTab: TabEnum }) => {
     },
     ...(userInfo?.team?.permission.hasWritePer
       ? [
-        {
-          icon: 'support/outlink/apikeyLight',
-          label: 'API Key',
-          value: TabEnum.apikey
-        }
-      ]
+          {
+            icon: 'support/outlink/apikeyLight',
+            label: 'API Key',
+            value: TabEnum.apikey
+          }
+        ]
       : []),
     {
       icon: 'support/account/loginoutLight',
@@ -60,7 +60,7 @@ const Account = ({currentTab}: { currentTab: TabEnum }) => {
     }
   ];
 
-  const {openConfirm, ConfirmModal} = useConfirm({
+  const { openConfirm, ConfirmModal } = useConfirm({
     content: '确认退出登录？'
   });
 
@@ -124,16 +124,16 @@ const Account = ({currentTab}: { currentTab: TabEnum }) => {
           )}
 
           <Box flex={'1 0 0'} h={'100%'} pb={[4, 0]} overflow={'auto'}>
-            {currentTab === TabEnum.info && <UserInfo/>}
-            {currentTab === TabEnum.promotion && <Promotion/>}
-            {currentTab === TabEnum.usage && <UsageTable/>}
-            {currentTab === TabEnum.bill && <BillTable/>}
-            {currentTab === TabEnum.individuation && <Individuation/>}
-            {currentTab === TabEnum.inform && <InformTable/>}
-            {currentTab === TabEnum.apikey && <ApiKeyTable/>}
+            {currentTab === TabEnum.info && <UserInfo />}
+            {currentTab === TabEnum.promotion && <Promotion />}
+            {currentTab === TabEnum.usage && <UsageTable />}
+            {currentTab === TabEnum.bill && <BillTable />}
+            {currentTab === TabEnum.individuation && <Individuation />}
+            {currentTab === TabEnum.inform && <InformTable />}
+            {currentTab === TabEnum.apikey && <ApiKeyTable />}
           </Box>
         </Flex>
-        <ConfirmModal/>
+        <ConfirmModal />
       </PageContainer>
     </>
   );

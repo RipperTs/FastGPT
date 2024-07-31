@@ -4,10 +4,7 @@ import { useTranslation } from 'next-i18next';
 
 const CostTooltip = ({ cost }: { cost?: number }) => {
   const { t } = useTranslation();
-  return (
-    <>
-    </>
-  );
+  return <></>;
 };
 
 export default CostTooltip;

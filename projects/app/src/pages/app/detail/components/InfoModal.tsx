@@ -155,12 +155,7 @@ const InfoModal = ({ onClose }: { onClose: () => void }) => {
 
   // 应用信息弹层
   return (
-    <MyModal
-      isOpen={true}
-      onClose={onClose}
-      iconSrc="/imgs/workflow/ai.svg"
-      title="修改应用信息"
-    >
+    <MyModal isOpen={true} onClose={onClose} iconSrc="/imgs/workflow/ai.svg" title="修改应用信息">
       <ModalBody>
         <Box fontSize={'sm'}>{t('common:core.app.Name and avatar')}</Box>
         <Flex mt={2} alignItems={'center'}>
@@ -194,7 +189,6 @@ const InfoModal = ({ onClose }: { onClose: () => void }) => {
           bg={'myWhite.600'}
           {...register('intro')}
         />
-
       </ModalBody>
 
       <ModalFooter>
