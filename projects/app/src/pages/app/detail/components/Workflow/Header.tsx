@@ -52,6 +52,9 @@ const Header = () => {
     try {
       await onSaveWorkflow();
       router.push('/app/list');
+      setTimeout(() => {
+        router.reload();
+      }, 1000);
     } catch (error) {}
   }, [onSaveWorkflow, router]);
 

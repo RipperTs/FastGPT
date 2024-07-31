@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
-import { Box, Flex, Button, IconButton } from '@chakra-ui/react';
+import { Box, Button, Flex, IconButton } from '@chakra-ui/react';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useBeforeunload } from '@fastgpt/web/hooks/useBeforeunload';
 import { useContextSelector } from 'use-context-selector';
-import { WorkflowContext, getWorkflowStore } from '../WorkflowComponents/context';
+import { getWorkflowStore, WorkflowContext } from '../WorkflowComponents/context';
 import { useInterval } from 'ahooks';
 import { AppContext, TabEnum } from '../context';
 import PopoverConfirm from '@fastgpt/web/components/common/MyPopover/PopoverConfirm';
@@ -14,9 +14,9 @@ import { useRouter } from 'next/router';
 
 import AppCard from '../WorkflowComponents/AppCard';
 import { uiWorkflow2StoreWorkflow } from '../WorkflowComponents/utils';
-import { useSystemStore } from '@/web/common/system/useSystemStore';
 import RouteTab from '../RouteTab';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
+
 const PublishHistories = dynamic(() => import('../PublishHistoriesSlider'));
 
 const Header = () => {
@@ -52,6 +52,9 @@ const Header = () => {
     try {
       await onSaveWorkflow();
       router.push('/app/list');
+      setTimeout(() => {
+        router.reload();
+      }, 1000);
     } catch (error) {}
   }, [onSaveWorkflow, router]);
   // effect
