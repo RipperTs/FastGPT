@@ -434,12 +434,14 @@ export async function getServerSideProps(context: any) {
     }
   })();
 
+  const isLogin = app?.isLogin ?? false;
+
   // 获取备选模型列表
   const alternativeModelList = await (async () => {
     try {
       await connectToDatabase();
       const app = (await MongoOutLink.aggregate([
-        { $match: { alternativeModel: true } },
+        { $match: { alternativeModel: true, isLogin: isLogin } },
         {
           $group: {
             _id: '$appId',
@@ -488,7 +490,7 @@ export async function getServerSideProps(context: any) {
       appIntro: app?.appId?.intro ?? 'intro',
       shareId: shareId ?? '',
       authToken: authToken ?? '',
-      isLogin: app?.isLogin ?? false,
+      isLogin: isLogin,
       hookUrl: app?.limit?.hookUrl ?? '',
       alternativeModelList,
       ...(await serviceSideProps(context, ['file', 'app']))
