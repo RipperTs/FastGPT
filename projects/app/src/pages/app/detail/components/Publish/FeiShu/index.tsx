@@ -137,7 +137,8 @@ const FeiShu = ({ appId }: { appId: string }) => {
                                 app: item.app,
                                 responseDetail: item.responseDetail,
                                 defaultResponse: item.defaultResponse,
-                                immediateResponse: item.immediateResponse
+                                immediateResponse: item.immediateResponse,
+                                isLogin: item.isLogin
                               })
                           },
                           {

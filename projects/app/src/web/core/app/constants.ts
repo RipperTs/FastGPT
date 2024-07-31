@@ -29,7 +29,8 @@ export const defaultOutLinkForm: OutLinkEditType = {
   limit: {
     QPM: 100,
     maxUsagePoints: -1
-  }
+  },
+  isLogin: false
 };
 
 // export const defaultWecomOutLinkForm: OutLinkConfigEditType = {
@@ -55,7 +56,8 @@ export const defaultFeishuOutLinkForm: OutLinkEditType<FeishuType> = {
     QPM: 100,
     maxUsagePoints: -1
   },
-  responseDetail: false
+  responseDetail: false,
+  isLogin: false
 };
 
 export enum TTSTypeEnum {
