@@ -51,10 +51,7 @@ const Header = () => {
   const saveAndBack = useCallback(async () => {
     try {
       await onSaveWorkflow();
-      router.push('/app/list');
-      setTimeout(() => {
-        router.reload();
-      }, 1000);
+      window.location.href = '/app/list';
     } catch (error) {}
   }, [onSaveWorkflow, router]);
 
