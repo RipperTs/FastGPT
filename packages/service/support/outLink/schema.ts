@@ -50,6 +50,10 @@ const OutLinkSchema = new Schema({
     type: Boolean,
     default: false
   },
+  alternativeModel: {
+    type: Boolean,
+    default: false
+  },
   limit: {
     maxUsagePoints: {
       type: Number,

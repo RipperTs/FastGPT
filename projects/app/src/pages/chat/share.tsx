@@ -25,7 +25,7 @@ import { connectToDatabase } from '@/service/mongo';
 import NextHead from '@/components/common/NextHead';
 import { useContextSelector } from 'use-context-selector';
 import ChatContextProvider, { ChatContext } from '@/web/core/chat/context/chatContext';
-import { InitChatResponse } from '@/global/core/chat/api';
+import { alternativeModel, InitChatResponse } from '@/global/core/chat/api';
 import { defaultChatData } from '@/global/core/chat/constants';
 import { useMount } from 'ahooks';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
@@ -52,9 +52,10 @@ type Props = {
   isLogin: boolean;
   hookUrl: string;
   cardNo?: string | null;
+  alternativeModelList?: alternativeModel[];
 };
 
-const OutLink = ({ appName, appIntro, appAvatar, cardNo }: Props) => {
+const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }: Props) => {
   const { t } = useTranslation();
   const router = useRouter();
   const {
@@ -297,6 +298,7 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo }: Props) => {
             {/* header */}
             {showHead === '1' ? (
               <ChatHeader
+                alternativeModelList={alternativeModelList}
                 chatData={chatData}
                 history={chatData.history}
                 showHistory={showHistory === '1'}
@@ -413,6 +415,7 @@ export async function getServerSideProps(context: any) {
   const shareId = context?.query?.shareId || '';
   const authToken = context?.query?.authToken || '';
 
+  // 查询当前分享的app信息及分享链接配置信息
   const app = await (async () => {
     try {
       await connectToDatabase();
@@ -431,6 +434,52 @@ export async function getServerSideProps(context: any) {
     }
   })();
 
+  // 获取备选模型列表
+  const alternativeModelList = await (async () => {
+    try {
+      await connectToDatabase();
+      const app = (await MongoOutLink.aggregate([
+        { $match: { alternativeModel: true } },
+        {
+          $group: {
+            _id: '$appId',
+            apps: { $push: '$$ROOT' },
+            shareId: { $first: '$shareId' },
+            name: { $first: '$name' }
+          }
+        },
+        {
+          $lookup: {
+            from: 'apps', // Assuming the collection name for apps is 'apps'
+            localField: '_id',
+            foreignField: '_id',
+            as: 'appDetails'
+          }
+        },
+        { $unwind: '$appDetails' },
+        {
+          $project: {
+            _id: 0,
+            appId: { $toString: '$_id' },
+            appName: '$appDetails.name',
+            appAvatar: '$appDetails.avatar',
+            appIntro: '$appDetails.intro',
+            shareId: 1,
+            name: 1
+          }
+        }
+      ])) as alternativeModel[];
+
+      // 排除掉 shareId 为当前分享的app
+      const result = app.filter((item) => item.shareId !== shareId);
+      console.log('alternativeModelList', result);
+      return result;
+    } catch (error) {
+      addLog.error('alternativeModelList', error);
+      return [];
+    }
+  })();
+
   return {
     props: {
       name: app?.name ?? 'name',
@@ -441,6 +490,7 @@ export async function getServerSideProps(context: any) {
       authToken: authToken ?? '',
       isLogin: app?.isLogin ?? false,
       hookUrl: app?.limit?.hookUrl ?? '',
+      alternativeModelList,
       ...(await serviceSideProps(context, ['file']))
     }
   };

@@ -104,8 +104,8 @@ const Share = ({ appId }: { appId: string; type: PublishChannelEnum }) => {
               <Th>有效期</Th>
               <Th>返回引用</Th>
               <Th>是否登录</Th>
-              <Th>QPM</Th>
               <Th>配置SSO地址</Th>
+              <Th>备选模型</Th>
               <Th>最后使用时间</Th>
               <Th></Th>
             </Tr>
@@ -121,8 +121,8 @@ const Share = ({ appId }: { appId: string; type: PublishChannelEnum }) => {
                 </Td>
                 <Td>{item.responseDetail ? '✔' : '✖'}</Td>
                 <Td>{item.isLogin ? '✔' : '✖'}</Td>
-                <Td>{item?.limit?.QPM || '-'}</Td>
                 <Td>{item?.limit?.hookUrl ? '✔' : '✖'}</Td>
+                <Td>{item.alternativeModel ? '✔' : '✖'}</Td>
                 <Td>
                   {item.lastTime ? formatTimeToChatTime(item.lastTime) : t('common:common.Un used')}
                 </Td>
@@ -157,7 +157,8 @@ const Share = ({ appId }: { appId: string; type: PublishChannelEnum }) => {
                                 name: item.name,
                                 responseDetail: item.responseDetail,
                                 limit: item.limit,
-                                isLogin: item.isLogin
+                                isLogin: item.isLogin,
+                                alternativeModel: item.alternativeModel
                               })
                           },
                           {
@@ -316,20 +317,16 @@ function EditLinkModal({
             }}
           />
         </Flex>
+
         <Flex alignItems={'center'} mt={4}>
           <Flex flex={'0 0 90px'} alignItems={'center'}>
-            <FormLabel>QPM</FormLabel>
-            <QuestionTip ml={1} label={publishT('qpm_tips' || '')}></QuestionTip>
+            <FormLabel>备选模型</FormLabel>
+            <QuestionTip
+              ml={1}
+              label="加入到备选模型列表, 在PC窗口可快速切换到此模型对话"
+            ></QuestionTip>
           </Flex>
-          <Input
-            max={1000}
-            {...register('limit.QPM', {
-              min: 0,
-              max: 1000,
-              valueAsNumber: true,
-              required: publishT('qpm_is_empty') || ''
-            })}
-          />
+          <Switch {...register('alternativeModel')} />
         </Flex>
 
         <Flex alignItems={'center'} mt={4}>

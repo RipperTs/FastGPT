@@ -1,5 +1,14 @@
-import React, { useState, useCallback } from 'react';
-import { Flex, useTheme, Box, useDisclosure } from '@chakra-ui/react';
+import React, { useCallback, useState } from 'react';
+import {
+  Box,
+  Button,
+  Flex,
+  ModalBody,
+  ModalFooter,
+  Select,
+  Toast,
+  useDisclosure
+} from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import Avatar from '@fastgpt/web/components/common/Avatar';
 import ToolMenu from './ToolMenu';
@@ -10,7 +19,7 @@ import MyTag from '@fastgpt/web/components/common/Tag/index';
 import { useContextSelector } from 'use-context-selector';
 import { ChatContext } from '@/web/core/chat/context/chatContext';
 import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
-import { InitChatResponse } from '@/global/core/chat/api';
+import { alternativeModel, InitChatResponse } from '@/global/core/chat/api';
 import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import LightRowTabs from '@fastgpt/web/components/common/Tabs/LightRowTabs';
@@ -22,8 +31,11 @@ import {
 } from '@fastgpt/global/common/parentFolder/type';
 import { getMyApps } from '@/web/core/app/api';
 import SelectOneResource from '@/components/common/folder/SelectOneResource';
+import MyModal from '@fastgpt/web/components/common/MyModal';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 
 const ChatHeader = ({
+  alternativeModelList,
   chatData,
   history,
   showHistory,
@@ -35,6 +47,7 @@ const ChatHeader = ({
   onRoute2AppDetail?: () => void;
   apps?: AppListItemType[];
   chatData: InitChatResponse;
+  alternativeModelList?: alternativeModel[];
 }) => {
   const isPlugin = chatData.app.type === AppTypeEnum.plugin;
   const { isPc } = useSystem();
@@ -52,6 +65,7 @@ const ChatHeader = ({
         >
           {isPc ? (
             <PcHeader
+              alternativeModelList={alternativeModelList}
               title={chatData.title}
               chatModels={chatData.app.chatModels}
               history={history}
@@ -88,6 +102,7 @@ const MobileDrawer = ({
     recently = 'recently',
     app = 'app'
   }
+
   const { t } = useTranslation();
   const { isPc } = useSystem();
   const router = useRouter();
@@ -211,6 +226,71 @@ const MobileDrawer = ({
   );
 };
 
+// 选择模型弹层
+const SelectModelModal = ({
+  alternativeModelList,
+  isOpen,
+  onClose
+}: {
+  alternativeModelList?: alternativeModel[];
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const [value, setValue] = useState<string>('');
+  const router = useRouter();
+
+  if (!alternativeModelList || alternativeModelList.length === 0) {
+    return;
+  }
+
+  const submit = () => {
+    if (!value) {
+      toast({
+        status: 'warning',
+        title: '请选择应用模型'
+      });
+      return;
+    }
+    const shareId = value;
+    setValue('');
+    onClose();
+    router.push(`/chat/share?shareId=${shareId}`);
+  };
+
+  return (
+    <MyModal
+      isOpen={isOpen}
+      iconSrc="core/workflow/inputType/selectLLM"
+      onClose={onClose}
+      maxW={['90vw', '700px']}
+      title={'切换应用模型'}
+    >
+      <ModalBody py={4} pb={10}>
+        <Select
+          placeholder="请选择应用模型"
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+        >
+          {alternativeModelList.map((item) => (
+            <option key={item.shareId} value={item.shareId}>
+              {item.appName}
+            </option>
+          ))}
+        </Select>
+      </ModalBody>
+      <ModalFooter>
+        <Button variant={'whiteBase'} mr={3} onClick={onClose}>
+          {t('common:common.Close')}
+        </Button>
+        <Button onClick={submit}>{t('common:common.Confirm')}</Button>
+      </ModalFooter>
+    </MyModal>
+  );
+};
+
 const MobileHeader = ({
   showHistory,
   go2AppDetail,
@@ -261,6 +341,7 @@ const MobileHeader = ({
 };
 
 const PcHeader = ({
+  alternativeModelList,
   title,
   chatModels,
   history
@@ -268,8 +349,18 @@ const PcHeader = ({
   title: string;
   chatModels?: string[];
   history: ChatItemType[];
+  alternativeModelList?: alternativeModel[];
 }) => {
   const { t } = useTranslation();
+  const [isOpenSelectModelModal, setOpenSelectModelModal] = useState(false);
+
+  const onOpen = () => {
+    setOpenSelectModelModal(true);
+  };
+  const onClose = () => {
+    setOpenSelectModelModal(false);
+  };
+
   return (
     <>
       <Box mr={3} maxW={'160px'} className="textEllipsis" color={'myGray.1000'}>
@@ -285,16 +376,23 @@ const PcHeader = ({
       </MyTag>
       {/* 当前模型名称 */}
       {!!chatModels && chatModels.length > 0 && (
-        <MyTooltip label="使用的 AI 模型">
+        <MyTooltip label="使用的 AI 模型, 点击可切换其他应用和模型">
           <MyTag ml={2} colorSchema={'green'}>
             <MyIcon name={'core/chat/chatModelTag'} w={'14px'} />
-            <Box ml={1} maxW={'200px'} cursor="pointer" className="textEllipsis">
+            <Box ml={1} maxW={'200px'} cursor="pointer" className="textEllipsis" onClick={onOpen}>
               {chatModels.join(',')}
             </Box>
           </MyTag>
         </MyTooltip>
       )}
       <Box flex={1} />
+      <SelectModelModal
+        alternativeModelList={alternativeModelList}
+        isOpen={isOpenSelectModelModal}
+        onClose={() => {
+          isOpenSelectModelModal && onClose();
+        }}
+      />
     </>
   );
 };

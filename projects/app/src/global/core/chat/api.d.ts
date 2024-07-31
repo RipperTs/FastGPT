@@ -26,6 +26,14 @@ export type InitTeamChatProps = {
   chatId?: string;
   teamToken: string;
 };
+export type alternativeModel = {
+  appId: string;
+  appName: string;
+  appAvatar: string;
+  appIntro: string;
+  shareId: string;
+  name: string;
+};
 export type InitChatResponse = {
   chatId?: string;
   appId: string;

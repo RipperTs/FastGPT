@@ -42,6 +42,7 @@ export type OutLinkSchema<T = void> = {
   responseDetail: boolean;
   // whether the user needs to log in
   isLogin: boolean;
+  alternativeModel: boolean;
 
   // response when request
   immediateResponse?: string;
@@ -76,6 +77,7 @@ export type OutLinkEditType<T = void> = {
   defaultResponse?: string;
   limit?: OutLinkSchema<T>['limit'];
   isLogin: OutLinkSchema<T>['isLogin'];
+  alternativeModel: OutLinkSchema<T>['alternativeModel'];
 
   // config for specific platform
   app?: T;

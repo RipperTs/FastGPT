@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import {
-  Flex,
   Box,
   Button,
-  TableContainer,
+  Flex,
   Table,
-  Thead,
-  Tr,
-  Th,
+  TableContainer,
+  Tbody,
   Td,
-  Tbody
+  Th,
+  Thead,
+  Tr
 } from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useLoading } from '@fastgpt/web/hooks/useLoading';
 import { useQuery } from '@tanstack/react-query';
-import { getShareChatList, delShareChatById } from '@/web/support/outLink/api';
+import { delShareChatById, getShareChatList } from '@/web/support/outLink/api';
 import { formatTimeToChatTime } from '@fastgpt/global/common/string/time';
 import { useCopyData } from '@/web/common/hooks/useCopyData';
 import { defaultFeishuOutLinkForm } from '@/web/core/app/constants';
@@ -138,7 +138,8 @@ const FeiShu = ({ appId }: { appId: string }) => {
                                 responseDetail: item.responseDetail,
                                 defaultResponse: item.defaultResponse,
                                 immediateResponse: item.immediateResponse,
-                                isLogin: item.isLogin
+                                isLogin: item.isLogin,
+                                alternativeModel: item.alternativeModel
                               })
                           },
                           {
