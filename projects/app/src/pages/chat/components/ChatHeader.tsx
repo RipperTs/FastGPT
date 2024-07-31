@@ -241,10 +241,6 @@ const SelectModelModal = ({
   const [value, setValue] = useState<string>('');
   const router = useRouter();
 
-  if (!alternativeModelList || alternativeModelList.length === 0) {
-    return;
-  }
-
   const submit = () => {
     if (!value) {
       toast({
@@ -274,7 +270,7 @@ const SelectModelModal = ({
             setValue(e.target.value);
           }}
         >
-          {alternativeModelList.map((item) => (
+          {alternativeModelList && alternativeModelList.map((item) => (
             <option key={item.shareId} value={item.shareId}>
               {item.appName}
             </option>
@@ -352,9 +348,17 @@ const PcHeader = ({
   alternativeModelList?: alternativeModel[];
 }) => {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [isOpenSelectModelModal, setOpenSelectModelModal] = useState(false);
 
   const onOpen = () => {
+    if (!alternativeModelList || alternativeModelList.length === 0) {
+      toast({
+        status: 'warning',
+        title: '没有可切换的模型'
+      });
+      return;
+    }
     setOpenSelectModelModal(true);
   };
   const onClose = () => {
