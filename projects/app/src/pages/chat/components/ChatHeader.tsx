@@ -74,7 +74,6 @@ const ChatHeader = ({
             <MobileHeader
               apps={apps}
               appId={chatData.appId}
-              go2AppDetail={onRoute2AppDetail}
               name={chatData.app.name}
               avatar={chatData.app.avatar}
               showHistory={showHistory}
