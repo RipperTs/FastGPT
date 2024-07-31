@@ -1,6 +1,6 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { EditorVariablePickerType } from '../../type';
-import { useCallback, useEffect, useMemo } from 'react';
+import { EditorVariableLabelPickerType } from '../../type';
+import { useCallback, useEffect } from 'react';
 import { $createVariableLabelNode, VariableLabelNode } from './node';
 import { TextNode } from 'lexical';
 import { getHashtagRegexString } from './utils';
@@ -12,7 +12,7 @@ const REGEX = new RegExp(getHashtagRegexString(), 'i');
 export default function VariableLabelPlugin({
   variables
 }: {
-  variables: EditorVariablePickerType[];
+  variables: EditorVariableLabelPickerType[];
 }) {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
@@ -20,18 +20,15 @@ export default function VariableLabelPlugin({
       throw new Error('VariableLabelPlugin: VariableLabelPlugin not registered on editor');
   }, [editor]);
 
-  const createVariableLabelPlugin = useCallback(
-    (textNode: TextNode): VariableLabelNode => {
-      const [parentKey, childrenKey] = textNode.getTextContent().slice(3, -3).split('.');
-      const currentVariable = variables.find(
-        (item) => item.parent?.id === parentKey && item.key === childrenKey
-      );
-      const variableLabel = `${currentVariable && currentVariable.parent?.label}.${currentVariable?.label}`;
-      const nodeAvatar = currentVariable?.parent?.avatar || '';
-      return $createVariableLabelNode(textNode.getTextContent(), variableLabel, nodeAvatar);
-    },
-    [variables]
-  );
+  const createVariableLabelPlugin = useCallback((textNode: TextNode): VariableLabelNode => {
+    const [parentKey, childrenKey] = textNode.getTextContent().slice(3, -3).split('.');
+    const currentVariable = variables.find(
+      (item) => item.parent.id === parentKey && item.key === childrenKey
+    );
+    const variableLabel = `${currentVariable && currentVariable.parent?.label}.${currentVariable?.label}`;
+    const nodeAvatar = currentVariable?.parent?.avatar || '';
+    return $createVariableLabelNode(textNode.getTextContent(), variableLabel, nodeAvatar);
+  }, []);
 
   const getVariableMatch = useCallback((text: string) => {
     const matches = REGEX.exec(text);
@@ -55,7 +52,7 @@ export default function VariableLabelPlugin({
         createVariableLabelPlugin
       )
     );
-  }, [createVariableLabelPlugin, editor, getVariableMatch, variables]);
+  }, [createVariableLabelPlugin, editor, getVariableMatch]);
 
   return null;
 }

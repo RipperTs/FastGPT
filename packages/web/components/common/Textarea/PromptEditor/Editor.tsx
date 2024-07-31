@@ -13,7 +13,7 @@ import { VariableNode } from './plugins/VariablePlugin/node';
 import { EditorState, LexicalEditor } from 'lexical';
 import OnBlurPlugin from './plugins/OnBlurPlugin';
 import MyIcon from '../../Icon';
-import { EditorVariablePickerType } from './type.d';
+import { EditorVariableLabelPickerType, EditorVariablePickerType } from './type.d';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import FocusPlugin from './plugins/FocusPlugin';
 import { textToEditorState } from './utils';
@@ -21,6 +21,7 @@ import { MaxLengthPlugin } from './plugins/MaxLengthPlugin';
 import { VariableLabelNode } from './plugins/VariableLabelPlugin/node';
 import VariableLabelPlugin from './plugins/VariableLabelPlugin';
 import { useDeepCompareEffect } from 'ahooks';
+import VariablePickerPlugin from './plugins/VariablePickerPlugin';
 
 export default function Editor({
   h = 200,
@@ -29,6 +30,7 @@ export default function Editor({
   showOpenModal = true,
   onOpenModal,
   variables,
+  variableLabels,
   onChange,
   onBlur,
   value,
@@ -41,6 +43,7 @@ export default function Editor({
   showOpenModal?: boolean;
   onOpenModal?: () => void;
   variables: EditorVariablePickerType[];
+  variableLabels: EditorVariableLabelPickerType[];
   onChange?: (editorState: EditorState, editor: LexicalEditor) => void;
   onBlur?: (editor: LexicalEditor) => void;
   value?: string;
@@ -83,10 +86,16 @@ export default function Editor({
   useDeepCompareEffect(() => {
     if (focus) return;
     setKey(getNanoid(6));
-  }, [value, variables]);
+  }, [value, variables, variableLabels]);
 
   return (
-    <Box position={'relative'} width={'full'} h={`${height}px`} cursor={'text'}>
+    <Box
+      position={'relative'}
+      width={'full'}
+      h={`${height}px`}
+      cursor={'text'}
+      color={'myGray.700'}
+    >
       <LexicalComposer initialConfig={initialConfig} key={key}>
         <PlainTextPlugin
           contentEditable={
@@ -130,9 +139,10 @@ export default function Editor({
             });
           }}
         />
-        <VariableLabelPickerPlugin variables={variables} isFocus={focus} />
+        <VariableLabelPlugin variables={variableLabels} />
+        <VariableLabelPickerPlugin variables={variableLabels} isFocus={focus} />
         <VariablePlugin variables={variables} />
-        <VariableLabelPlugin variables={variables} />
+        <VariablePickerPlugin variables={variableLabels.length > 0 ? [] : variables} />
         <OnBlurPlugin onBlur={onBlur} />
       </LexicalComposer>
       {showResize && (

@@ -300,7 +300,7 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
               <ChatHeader
                 alternativeModelList={alternativeModelList}
                 chatData={chatData}
-                history={chatData.history}
+                history={chatRecords}
                 showHistory={showHistory === '1'}
               />
             ) : null}
@@ -491,7 +491,7 @@ export async function getServerSideProps(context: any) {
       isLogin: app?.isLogin ?? false,
       hookUrl: app?.limit?.hookUrl ?? '',
       alternativeModelList,
-      ...(await serviceSideProps(context, ['file']))
+      ...(await serviceSideProps(context, ['file', 'app']))
     }
   };
 }
