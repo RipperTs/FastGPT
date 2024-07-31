@@ -423,7 +423,7 @@ export async function getServerSideProps(context: any) {
         {
           shareId
         },
-        'appId limit name isLogin'
+        'appId limit name isLogin alternativeModel'
       )
         .populate('appId', 'name avatar intro')
         .lean()) as OutLinkWithAppType;
@@ -435,10 +435,14 @@ export async function getServerSideProps(context: any) {
   })();
 
   const isLogin = app?.isLogin ?? false;
+  const alternativeModel = app?.alternativeModel ?? false;
 
   // 获取备选模型列表
   const alternativeModelList = await (async () => {
     try {
+      if (!alternativeModel) {
+        return [];
+      }
       await connectToDatabase();
       const app = (await MongoOutLink.aggregate([
         { $match: { alternativeModel: true, isLogin: isLogin } },
@@ -473,11 +477,8 @@ export async function getServerSideProps(context: any) {
       ])) as alternativeModel[];
 
       // 排除掉 shareId 为当前分享的app
-      const result = app.filter((item) => item.shareId !== shareId);
-      console.log('alternativeModelList', result);
-      return result;
+      return app.filter((item) => item.shareId !== shareId);
     } catch (error) {
-      addLog.error('alternativeModelList', error);
       return [];
     }
   })();
