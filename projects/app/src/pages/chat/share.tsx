@@ -36,20 +36,25 @@ import {getNanoid} from '@fastgpt/global/common/string/tools';
 import dynamic from 'next/dynamic';
 import {useSystem} from '@fastgpt/web/hooks/useSystem';
 import Permission from "@fastgpt/service/core/chat/Permission";
+import Cookies from 'js-cookie';
 
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 12);
 
 const CustomPluginRunBox = dynamic(() => import('./components/CustomPluginRunBox'));
 
 type Props = {
+  name: string;
   appName: string;
   appIntro: string;
   appAvatar: string;
   shareId: string;
   authToken: string;
+  isLogin: boolean;
+  hookUrl: string;
+  cardNo?: string | null;
 };
 
-const OutLink = ({appName, appIntro, appAvatar}: Props) => {
+const OutLink = ({appName, appIntro, appAvatar, cardNo}: Props) => {
   const {t} = useTranslation();
   const router = useRouter();
   const {
@@ -58,8 +63,6 @@ const OutLink = ({appName, appIntro, appAvatar}: Props) => {
     showHistory = '1',
     showHead = '1',
     authToken,
-    isLogin = '0',
-    card,
     ...customVariables
   } = router.query as {
     shareId: string;
@@ -67,41 +70,17 @@ const OutLink = ({appName, appIntro, appAvatar}: Props) => {
     showHistory: '0' | '1';
     showHead: '0' | '1';
     authToken: string;
-    isLogin: '0' | '1';
-    card: string;
     [key: string]: string;
   };
   const {isPc} = useSystem();
   const initSign = useRef(false);
   const [isEmbed, setIdEmbed] = useState(true);
-  const [hasPermission, setHasPermission] = useState(true);
 
   const [chatData, setChatData] = useState<InitChatResponse>(defaultChatData);
   const appId = chatData.appId;
 
-  // 需要跳转登录页面
-  const initPermissions = async () => {
-    const rawUrl = window.location.origin;
-    if (!authToken && isLogin === '1') {
-      const result = await Permission.initPermissions(window.location.href, 'know:answerjin:view');
-      if (result.code !== 200) {
-        setHasPermission(false);
-        // @ts-ignore
-        window.location.href = result.redirectUrl;
-        return;
-      }
-      // @ts-ignore
-      window.location.href = rawUrl + `/chat/share?shareId=${shareId}&showHistory=${showHistory}&isLogin=1&authToken=${result.username}&chatId=${chatId}`;
-      setHasPermission(true);
-    }
-  };
-
-  useEffect(() => {
-    initPermissions();
-  }, []);
-
   const {localUId} = useShareChatStore();
-  const outLinkUid: string = authToken || localUId;
+  const outLinkUid: string = cardNo || authToken || localUId;
 
   const {
     loadHistories,
@@ -247,7 +226,7 @@ const OutLink = ({appName, appIntro, appAvatar}: Props) => {
     setIdEmbed(window !== top);
   });
 
-  return hasPermission ? (
+  return (
     <>
       <NextHead title={appName} desc={appIntro} icon={appAvatar}/>
 
@@ -369,13 +348,43 @@ const OutLink = ({appName, appIntro, appAvatar}: Props) => {
         </Flex>
       </PageContainer>
     </>
-  ) : (<></>);
+  );
 };
 
 const Render = (props: Props) => {
-  const {shareId, authToken} = props;
+  const {shareId, authToken, isLogin, hookUrl} = props;
+  const [hasPermission, setHasPermission] = useState(true);
+
+  // 获取cookie的值
+  let cardNo = Cookies.get('card_no') || '';
+  // 判断是否登录并初始化登录权限
+  const initPermissions = async () => {
+    if (!isLogin || cardNo) {
+      setHasPermission(true);
+      return;
+    }
+    if (!authToken && isLogin) {
+      const result = await Permission.initPermissions(window.location.href, hookUrl, 'know:answerjin:view');
+      if (result.code !== 200) {
+        setHasPermission(false);
+        // @ts-ignore
+        window.location.href = result.redirectUrl;
+        return;
+      }
+      // @ts-ignore
+      Cookies.set('card_no', result.username, {expires: 30});
+      // @ts-ignore
+      cardNo = result.username;
+      setHasPermission(true);
+    }
+  };
+
+  useEffect(() => {
+    initPermissions();
+  }, []);
+
   const {localUId} = useShareChatStore();
-  const outLinkUid: string = authToken || localUId;
+  const outLinkUid: string = cardNo || authToken || localUId;
 
   const {data: histories = [], runAsync: loadHistories} = useRequest2(
     () => (shareId && outLinkUid ? getChatHistories({shareId, outLinkUid}) : Promise.resolve([])),
@@ -385,11 +394,11 @@ const Render = (props: Props) => {
     }
   );
 
-  return (
+  return hasPermission ? (
     <ChatContextProvider histories={histories} loadHistories={loadHistories}>
-      <OutLink {...props} />;
+      <OutLink {...props} cardNo={cardNo}/>;
     </ChatContextProvider>
-  );
+  ) : (<></>);
 };
 
 export default Render;
@@ -405,7 +414,7 @@ export async function getServerSideProps(context: any) {
         {
           shareId
         },
-        'appId'
+        'appId limit name isLogin'
       )
         .populate('appId', 'name avatar intro')
         .lean()) as OutLinkWithAppType;
@@ -418,11 +427,14 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
+      name: app?.name ?? 'name',
       appName: app?.appId?.name ?? 'name',
       appAvatar: app?.appId?.avatar ?? '',
       appIntro: app?.appId?.intro ?? 'intro',
       shareId: shareId ?? '',
       authToken: authToken ?? '',
+      isLogin: app?.isLogin ?? false,
+      hookUrl: app?.limit?.hookUrl ?? '',
       ...(await serviceSideProps(context, ['file']))
     }
   };

@@ -32,15 +32,20 @@ interface ErrorPermission {
 class Permission {
   // 初始化baseurl参数
   static baseUrl = 'http://localhost:3000';
+  // 登录地址
+  static loginUrl = 'http://10.6.1.198:8888'
 
   /**
    * 初始化权限
    * @param baseUrl
+   * @param loginUrl
    * @param permission
    */
   static async initPermissions(baseUrl: string,
+                               loginUrl: string,
                                permission: string): Promise<PermissionData | ErrorPermission> {
     this.baseUrl = baseUrl;
+    this.loginUrl = loginUrl;
     const token = this.getQueryString('token');
     if (!token) {
       return this.noPermission(401, '登录失效，请重新登录~');
@@ -82,8 +87,7 @@ class Permission {
    * @param msg
    */
   static noPermission(code: number, msg: string): ErrorPermission {
-    const redirectUrl = `http://10.6.1.129/login/index.html?url=${this.baseUrl}`
-    // window.location.href = redirectUrl
+    const redirectUrl = `${this.loginUrl}${this.baseUrl}`
     return {code: code, msg: msg, redirectUrl: redirectUrl};
   }
 

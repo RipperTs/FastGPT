@@ -46,6 +46,10 @@ const OutLinkSchema = new Schema({
     type: Boolean,
     default: false
   },
+  isLogin: {
+    type: Boolean,
+    default: false
+  },
   limit: {
     maxUsagePoints: {
       type: Number,

@@ -100,21 +100,13 @@ const Share = ({ appId }: { appId: string; type: PublishChannelEnum }) => {
         <Table variant={'simple'} w={'100%'} overflowX={'auto'} fontSize={'sm'}>
           <Thead>
             <Tr>
-              <Th>{t('common:common.Name')}</Th>
-              {feConfigs?.isPlus && (
-                <>
-                  <Th>{t('common:common.Expired Time')}</Th>
-                </>
-              )}
-              <Th>{t('common:support.outlink.Usage points')}</Th>
-              <Th>{t('common:core.app.share.Is response quote')}</Th>
-              {feConfigs?.isPlus && (
-                <>
-                  <Th>{t('common:core.app.share.Ip limit title')}</Th>
-                  <Th>{t('common:core.app.share.Role check')}</Th>
-                </>
-              )}
-              <Th>{t('common:common.Last use time')}</Th>
+              <Th>名称</Th>
+              <Th>有效期</Th>
+              <Th>返回引用</Th>
+              <Th>是否登录</Th>
+              <Th>QPM</Th>
+              <Th>配置SSO地址</Th>
+              <Th>最后使用时间</Th>
               <Th></Th>
             </Tr>
           </Thead>
@@ -122,33 +114,15 @@ const Share = ({ appId }: { appId: string; type: PublishChannelEnum }) => {
             {shareChatList.map((item) => (
               <Tr key={item._id}>
                 <Td>{item.name}</Td>
-                {feConfigs?.isPlus && (
-                  <>
-                    <Td>
-                      {item.limit?.expiredTime
-                        ? dayjs(item.limit.expiredTime).format('YYYY-MM-DD HH:mm')
-                        : '-'}
-                    </Td>
-                  </>
-                )}
                 <Td>
-                  {Math.round(item.usagePoints)}
-                  {feConfigs?.isPlus
-                    ? `${
-                        item.limit?.maxUsagePoints && item.limit.maxUsagePoints > -1
-                          ? ` / ${item.limit.maxUsagePoints}`
-                          : ` / ${t('common:common.Unlimited')}`
-                      }`
-                    : ''}
+                  {item.limit?.expiredTime
+                    ? dayjs(item.limit.expiredTime).format('YYYY-MM-DD HH:mm')
+                    : '-'}
                 </Td>
                 <Td>{item.responseDetail ? '✔' : '✖'}</Td>
-                {feConfigs?.isPlus && (
-                  <>
-                    <Td>{item?.limit?.QPM || '-'}</Td>
-
-                    <Th>{item?.limit?.hookUrl ? '✔' : '✖'}</Th>
-                  </>
-                )}
+                <Td>{item.isLogin ? '✔' : '✖'}</Td>
+                <Td>{item?.limit?.QPM || '-'}</Td>
+                <Td>{item?.limit?.hookUrl ? '✔' : '✖'}</Td>
                 <Td>
                   {item.lastTime ? formatTimeToChatTime(item.lastTime) : t('common:common.Un used')}
                 </Td>
@@ -182,7 +156,8 @@ const Share = ({ appId }: { appId: string; type: PublishChannelEnum }) => {
                                 _id: item._id,
                                 name: item.name,
                                 responseDetail: item.responseDetail,
-                                limit: item.limit
+                                limit: item.limit,
+                                isLogin: item.isLogin
                               })
                           },
                           {
@@ -314,86 +289,74 @@ function EditLinkModal({
         </Flex>
         <Flex alignItems={'center'} mt={4}>
           <Flex flex={'0 0 90px'} alignItems={'center'}>
-            <FormLabel>{publishT('token_auth')}</FormLabel>
-            <QuestionTip ml={1} label="暂不支持"></QuestionTip>
+            <FormLabel>登录地址</FormLabel>
+            <QuestionTip ml={1} label="因用户验证服务端接口固定, 目前仅支持旧版登录地址"></QuestionTip>
           </Flex>
           <Input
-            placeholder={publishT('token_auth_tips') || ''}
+            placeholder='SSO登录地址'
             fontSize={'sm'}
             {...register('limit.hookUrl')}
           />
         </Flex>
-        {feConfigs?.isPlus && (
-          <>
-            <Flex alignItems={'center'} mt={4}>
-              <FormLabel flex={'0 0 90px'} alignItems={'center'}>
-                {t('common:common.Expired Time')}
-              </FormLabel>
-              <Input
-                type="datetime-local"
-                defaultValue={
-                  defaultData.limit?.expiredTime
-                    ? dayjs(defaultData.limit?.expiredTime).format('YYYY-MM-DDTHH:mm')
-                    : ''
-                }
-                onChange={(e) => {
-                  setValue('limit.expiredTime', new Date(e.target.value));
-                }}
-              />
-            </Flex>
-            <Flex alignItems={'center'} mt={4}>
-              <Flex flex={'0 0 90px'} alignItems={'center'}>
-                <FormLabel>QPM</FormLabel>
-                <QuestionTip ml={1} label={publishT('qpm_tips' || '')}></QuestionTip>
-              </Flex>
-              <Input
-                max={1000}
-                {...register('limit.QPM', {
-                  min: 0,
-                  max: 1000,
-                  valueAsNumber: true,
-                  required: publishT('qpm_is_empty') || ''
-                })}
-              />
-            </Flex>
-            <Flex alignItems={'center'} mt={4}>
-              <Flex flex={'0 0 90px'} alignItems={'center'}>
-                <FormLabel>{t('common:support.outlink.Max usage points')}</FormLabel>
-                <QuestionTip
-                  ml={1}
-                  label={t('common:support.outlink.Max usage points tip')}
-                ></QuestionTip>
-              </Flex>
-              <Input
-                {...register('limit.maxUsagePoints', {
-                  min: -1,
-                  max: 10000000,
-                  valueAsNumber: true,
-                  required: true
-                })}
-              />
-            </Flex>
-
-            <Link
-              href={getDocPath('/docs/development/openapi/share')}
-              target={'_blank'}
-              fontSize={'xs'}
-              color={'myGray.500'}
-            >
-              {publishT('token_auth_use_cases')}
-            </Link>
-          </>
-        )}
+        <Flex
+          fontSize={'xs'}
+          mt={1}
+          color={'myGray.500'}
+        >
+          示例: http://10.6.1.129/login/index.html?url=
+        </Flex>
+        <Flex alignItems={'center'} mt={4}>
+          <FormLabel flex={'0 0 90px'} alignItems={'center'}>
+            {t('common:common.Expired Time')}
+          </FormLabel>
+          <Input
+            type="datetime-local"
+            defaultValue={
+              defaultData.limit?.expiredTime
+                ? dayjs(defaultData.limit?.expiredTime).format('YYYY-MM-DDTHH:mm')
+                : ''
+            }
+            onChange={(e) => {
+              setValue('limit.expiredTime', new Date(e.target.value));
+            }}
+          />
+        </Flex>
+        <Flex alignItems={'center'} mt={4}>
+          <Flex flex={'0 0 90px'} alignItems={'center'}>
+            <FormLabel>QPM</FormLabel>
+            <QuestionTip ml={1} label={publishT('qpm_tips' || '')}></QuestionTip>
+          </Flex>
+          <Input
+            max={1000}
+            {...register('limit.QPM', {
+              min: 0,
+              max: 1000,
+              valueAsNumber: true,
+              required: publishT('qpm_is_empty') || ''
+            })}
+          />
+        </Flex>
 
         <Flex alignItems={'center'} mt={4}>
           <Flex flex={'0 0 90px'} alignItems={'center'}>
-            <FormLabel>{t('common:support.outlink.share.Response Quote')}</FormLabel>
+            <FormLabel>返回引用</FormLabel>
             <QuestionTip
               ml={1}
-              label={t('support.outlink.share.Response Quote tips' || '')}
+              label="在回复中返回引用内容, 但不会允许用户下载文档"
             ></QuestionTip>
           </Flex>
           <Switch {...register('responseDetail')} />
+        </Flex>
+
+        <Flex alignItems={'center'} mt={4}>
+          <Flex flex={'0 0 90px'} alignItems={'center'}>
+            <FormLabel>是否登录</FormLabel>
+            <QuestionTip
+              ml={1}
+              label="开启后请务必填写登录地址"
+            ></QuestionTip>
+          </Flex>
+          <Switch {...register('isLogin')} />
         </Flex>
       </ModalBody>
 

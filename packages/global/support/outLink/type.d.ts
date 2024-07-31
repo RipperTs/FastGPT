@@ -40,6 +40,8 @@ export type OutLinkSchema<T = void> = {
 
   // whether the response content is detailed
   responseDetail: boolean;
+  // whether the user needs to log in
+  isLogin: boolean;
 
   // response when request
   immediateResponse?: string;
@@ -73,6 +75,7 @@ export type OutLinkEditType<T = void> = {
   // response when error or other situation
   defaultResponse?: string;
   limit?: OutLinkSchema<T>['limit'];
+  isLogin: OutLinkSchema<T>['isLogin'];
 
   // config for specific platform
   app?: T;

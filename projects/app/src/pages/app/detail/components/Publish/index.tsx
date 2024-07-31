@@ -24,14 +24,14 @@ const OutLink = () => {
   const publishList = useRef([
     {
       icon: '/imgs/modal/shareFill.svg',
-      title: t('common:core.app.Share link'),
-      desc: t('common:core.app.Share link desc'),
+      title: '在线对话窗口',
+      desc: '分享链接给其他用户，可直接进行使用',
       value: PublishChannelEnum.share
     },
     {
       icon: 'support/outlink/apikeyFill',
-      title: t('common:core.app.Api request'),
-      desc: t('common:core.app.Api request desc'),
+      title: 'API 访问',
+      desc: '通过 API 接入到已有系统中，或者企业微信、飞书等',
       value: PublishChannelEnum.apikey
     }
     // {
