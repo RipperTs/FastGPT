@@ -293,7 +293,7 @@ function EditLinkModal({
             <FormLabel>登录地址</FormLabel>
             <QuestionTip
               ml={1}
-              label="因用户验证服务端接口固定, 目前仅支持旧版登录地址"
+              label="此功能仅做身份识别, 无法严格校验用户权限"
             ></QuestionTip>
           </Flex>
           <Input placeholder="SSO登录地址" fontSize={'sm'} {...register('limit.hookUrl')} />

@@ -1,32 +1,24 @@
 import axios, {AxiosResponse} from "axios";
 
-interface UserInfoData {
-  name: string;
-  department: string;
+type UserInfoData = {
+  name?: string;
+  department?: string;
   empNo: string;
-  post: string;
-  postGrade: string;
-  postType: string;
-  postLine: string;
-  postName: string;
-  updateTime: string;
+  post?: string;
+  postGrade?: string;
+  postType?: string;
+  postLine?: string;
+  postName?: string;
+  updateTime?: string;
 }
 
-interface PermissionData {
+type PermissionData = {
   code: number;
   msg: string;
-  permission: string;
-  token: string;
-  username: string;
-  role: string;
-  permitted: boolean;
-  post: UserInfoData;
-}
-
-interface ErrorPermission {
-  code: number;
-  msg: string;
-  redirectUrl: string;
+  token?: string;
+  username?: string | '';
+  post?: UserInfoData;
+  redirectUrl?: string;
 }
 
 class Permission {
@@ -43,7 +35,7 @@ class Permission {
    */
   static async initPermissions(baseUrl: string,
                                loginUrl: string,
-                               permission: string): Promise<PermissionData | ErrorPermission> {
+                               permission: string): Promise<PermissionData> {
     this.baseUrl = baseUrl;
     this.loginUrl = loginUrl;
     const token = this.getQueryString('token');
@@ -58,10 +50,6 @@ class Permission {
     }
     if (result.data.code !== 200) {
       return this.noPermission(422, result.data.msg);
-    }
-
-    if (result.data.permission === 'no') {
-      return this.noPermission(401, '您没有权限访问该页面~');
     }
 
     return result.data;
@@ -86,7 +74,7 @@ class Permission {
    * @param code
    * @param msg
    */
-  static noPermission(code: number, msg: string): ErrorPermission {
+  static noPermission(code: number, msg: string): PermissionData {
     const redirectUrl = `${this.loginUrl}${this.baseUrl}`
     return {code: code, msg: msg, redirectUrl: redirectUrl};
   }

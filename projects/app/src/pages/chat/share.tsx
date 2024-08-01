@@ -1,40 +1,40 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
-import { Box, Drawer, DrawerContent, DrawerOverlay, Flex } from '@chakra-ui/react';
-import { streamFetch } from '@/web/common/api/fetch';
-import { useShareChatStore } from '@/web/core/chat/storeShareChat';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useRouter} from 'next/router';
+import {Box, Drawer, DrawerContent, DrawerOverlay, Flex} from '@chakra-ui/react';
+import {streamFetch} from '@/web/common/api/fetch';
+import {useShareChatStore} from '@/web/core/chat/storeShareChat';
 import SideBar from '@/components/SideBar';
-import { GPTMessages2Chats } from '@fastgpt/global/core/chat/adapt';
-import { customAlphabet } from 'nanoid';
+import {GPTMessages2Chats} from '@fastgpt/global/core/chat/adapt';
+import {customAlphabet} from 'nanoid';
 import ChatBox from '@/components/core/chat/ChatContainer/ChatBox';
-import type { StartChatFnProps } from '@/components/core/chat/ChatContainer/type';
+import type {StartChatFnProps} from '@/components/core/chat/ChatContainer/type';
 
 import PageContainer from '@/components/PageContainer';
 import ChatHeader from './components/ChatHeader';
 import ChatHistorySlider from './components/ChatHistorySlider';
-import { serviceSideProps } from '@/web/common/utils/i18n';
-import { checkChatSupportSelectFileByChatModels } from '@/web/core/chat/utils';
-import { useTranslation } from 'next-i18next';
-import { delChatRecordById, getChatHistories, getInitOutLinkChatInfo } from '@/web/core/chat/api';
-import { getChatTitleFromChatMessage } from '@fastgpt/global/core/chat/utils';
-import { ChatStatusEnum } from '@fastgpt/global/core/chat/constants';
-import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
-import { OutLinkWithAppType } from '@fastgpt/global/support/outLink/type';
-import { addLog } from '@fastgpt/service/common/system/log';
-import { connectToDatabase } from '@/service/mongo';
+import {serviceSideProps} from '@/web/common/utils/i18n';
+import {checkChatSupportSelectFileByChatModels} from '@/web/core/chat/utils';
+import {useTranslation} from 'next-i18next';
+import {delChatRecordById, getChatHistories, getInitOutLinkChatInfo} from '@/web/core/chat/api';
+import {getChatTitleFromChatMessage} from '@fastgpt/global/core/chat/utils';
+import {ChatStatusEnum} from '@fastgpt/global/core/chat/constants';
+import {MongoOutLink} from '@fastgpt/service/support/outLink/schema';
+import {OutLinkWithAppType} from '@fastgpt/global/support/outLink/type';
+import {addLog} from '@fastgpt/service/common/system/log';
+import {connectToDatabase} from '@/service/mongo';
 import NextHead from '@/components/common/NextHead';
-import { useContextSelector } from 'use-context-selector';
-import ChatContextProvider, { ChatContext } from '@/web/core/chat/context/chatContext';
-import { alternativeModel, InitChatResponse } from '@/global/core/chat/api';
-import { defaultChatData } from '@/global/core/chat/constants';
-import { useMount } from 'ahooks';
-import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
-import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
-import { useChat } from '@/components/core/chat/ChatContainer/useChat';
-import { getNanoid } from '@fastgpt/global/common/string/tools';
+import {useContextSelector} from 'use-context-selector';
+import ChatContextProvider, {ChatContext} from '@/web/core/chat/context/chatContext';
+import {alternativeModel, InitChatResponse} from '@/global/core/chat/api';
+import {defaultChatData} from '@/global/core/chat/constants';
+import {useMount} from 'ahooks';
+import {useRequest2} from '@fastgpt/web/hooks/useRequest';
+import {AppTypeEnum} from '@fastgpt/global/core/app/constants';
+import {useChat} from '@/components/core/chat/ChatContainer/useChat';
+import {getNanoid} from '@fastgpt/global/common/string/tools';
 
 import dynamic from 'next/dynamic';
-import { useSystem } from '@fastgpt/web/hooks/useSystem';
+import {useSystem} from '@fastgpt/web/hooks/useSystem';
 import Permission from '@fastgpt/service/core/chat/Permission';
 import Cookies from 'js-cookie';
 
@@ -55,8 +55,8 @@ type Props = {
   alternativeModelList?: alternativeModel[];
 };
 
-const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }: Props) => {
-  const { t } = useTranslation();
+const OutLink = ({appName, appIntro, appAvatar, cardNo, alternativeModelList}: Props) => {
+  const {t} = useTranslation();
   const router = useRouter();
   const {
     shareId = '',
@@ -73,15 +73,15 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
     authToken: string;
     [key: string]: string;
   };
-  const { isPc } = useSystem();
+  const {isPc} = useSystem();
   const initSign = useRef(false);
   const [isEmbed, setIdEmbed] = useState(true);
 
   const [chatData, setChatData] = useState<InitChatResponse>(defaultChatData);
   const appId = chatData.appId;
 
-  const { localUId } = useShareChatStore();
-  const outLinkUid: string = cardNo || authToken || localUId;
+  const {localUId} = useShareChatStore();
+  const outLinkUid: string = authToken || cardNo || localUId;
 
   const {
     loadHistories,
@@ -105,7 +105,7 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
   } = useChat();
 
   const startChat = useCallback(
-    async ({ messages, controller, generatingMessage, variables }: StartChatFnProps) => {
+    async ({messages, controller, generatingMessage, variables}: StartChatFnProps) => {
       const completionChatId = chatId || getNanoid();
       const histories = messages.slice(-1);
 
@@ -120,7 +120,7 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
         '*'
       );
 
-      const { responseText, responseData } = await streamFetch({
+      const {responseText, responseData} = await streamFetch({
         data: {
           messages: histories,
           variables: {
@@ -162,7 +162,7 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
         '*'
       );
 
-      return { responseText, responseData, isNewChat: forbidLoadChat.current };
+      return {responseText, responseData, isNewChat: forbidLoadChat.current};
     },
     [
       chatId,
@@ -176,7 +176,7 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
     ]
   );
 
-  const { loading } = useRequest2(
+  const {loading} = useRequest2(
     async () => {
       if (!shareId || !outLinkUid || forbidLoadChat.current) return;
 
@@ -206,7 +206,7 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
         if (!initSign.current) {
           initSign.current = true;
           if (window !== top) {
-            window.top?.postMessage({ type: 'shareChatReady' }, '*');
+            window.top?.postMessage({type: 'shareChatReady'}, '*');
           }
         }
       },
@@ -229,13 +229,13 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
 
   return (
     <>
-      <NextHead title={appName} desc={appIntro} icon={appAvatar} />
+      <NextHead title={appName} desc={appIntro} icon={appAvatar}/>
 
       <PageContainer
         isLoading={loading}
         {...(isEmbed
-          ? { p: '0 !important', insertProps: { borderRadius: '0', boxShadow: 'none' } }
-          : { p: [0, 5] })}
+          ? {p: '0 !important', insertProps: {borderRadius: '0', boxShadow: 'none'}}
+          : {p: [0, 5]})}
       >
         <Flex h={'100%'} flexDirection={['column', 'row']}>
           {showHistory === '1' &&
@@ -250,7 +250,7 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
                   size={'xs'}
                   onClose={onCloseSlider}
                 >
-                  <DrawerOverlay backgroundColor={'rgba(255,255,255,0.5)'} />
+                  <DrawerOverlay backgroundColor={'rgba(255,255,255,0.5)'}/>
                   <DrawerContent maxWidth={'75vw'} boxShadow={'2px 0 10px rgba(0,0,0,0.15)'}>
                     {children}
                   </DrawerContent>
@@ -261,11 +261,11 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
                 appName={chatData.app.name}
                 appAvatar={chatData.app.avatar}
                 confirmClearText={t('common:core.chat.Confirm to clear share chat history')}
-                onDelHistory={({ chatId }) =>
-                  onDelHistory({ appId: chatData.appId, chatId, shareId, outLinkUid })
+                onDelHistory={({chatId}) =>
+                  onDelHistory({appId: chatData.appId, chatId, shareId, outLinkUid})
                 }
                 onClearHistory={() => {
-                  onClearHistories({ shareId, outLinkUid });
+                  onClearHistories({shareId, outLinkUid});
                 }}
                 onSetHistoryTop={(e) => {
                   onUpdateHistory({
@@ -330,7 +330,7 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
                   showFileSelector={checkChatSupportSelectFileByChatModels(chatData.app.chatModels)}
                   feedbackType={'user'}
                   onStartChat={startChat}
-                  onDelMessage={({ contentId }) =>
+                  onDelMessage={({contentId}) =>
                     delChatRecordById({
                       contentId,
                       appId: chatData.appId,
@@ -354,14 +354,19 @@ const OutLink = ({ appName, appIntro, appAvatar, cardNo, alternativeModelList }:
 };
 
 const Render = (props: Props) => {
-  const { shareId, authToken, isLogin, hookUrl } = props;
+  const {shareId, authToken, isLogin, hookUrl} = props;
   const [hasPermission, setHasPermission] = useState(true);
 
   // 获取cookie的值
   let cardNo = Cookies.get('card_no') || '';
   // 判断是否登录并初始化登录权限
   const initPermissions = async () => {
-    if (!isLogin || cardNo) {
+    if (!isLogin) {
+      cardNo = '';
+      setHasPermission(true);
+      return;
+    }
+    if (cardNo) {
       setHasPermission(true);
       return;
     }
@@ -373,14 +378,11 @@ const Render = (props: Props) => {
       );
       if (result.code !== 200) {
         setHasPermission(false);
-        // @ts-ignore
-        window.location.href = result.redirectUrl;
+        window.location.href = result.redirectUrl + '';
         return;
       }
-      // @ts-ignore
-      Cookies.set('card_no', result.username, { expires: 30 });
-      // @ts-ignore
-      cardNo = result.username;
+      Cookies.set('card_no', result?.username ?? '', {expires: 30});
+      cardNo = result?.username ?? '';
       setHasPermission(true);
     }
   };
@@ -389,11 +391,11 @@ const Render = (props: Props) => {
     initPermissions();
   }, []);
 
-  const { localUId } = useShareChatStore();
-  const outLinkUid: string = cardNo || authToken || localUId;
+  const {localUId} = useShareChatStore();
+  const outLinkUid: string = authToken || cardNo || localUId;
 
-  const { data: histories = [], runAsync: loadHistories } = useRequest2(
-    () => (shareId && outLinkUid ? getChatHistories({ shareId, outLinkUid }) : Promise.resolve([])),
+  const {data: histories = [], runAsync: loadHistories} = useRequest2(
+    () => (shareId && outLinkUid ? getChatHistories({shareId, outLinkUid}) : Promise.resolve([])),
     {
       manual: false,
       refreshDeps: [shareId, outLinkUid]
@@ -402,7 +404,7 @@ const Render = (props: Props) => {
 
   return hasPermission ? (
     <ChatContextProvider histories={histories} loadHistories={loadHistories}>
-      <OutLink {...props} cardNo={cardNo} />;
+      <OutLink {...props} cardNo={cardNo}/>;
     </ChatContextProvider>
   ) : (
     <></>
@@ -445,13 +447,13 @@ export async function getServerSideProps(context: any) {
       }
       await connectToDatabase();
       const app = (await MongoOutLink.aggregate([
-        { $match: { alternativeModel: true, isLogin: isLogin } },
+        {$match: {alternativeModel: true, isLogin: isLogin}},
         {
           $group: {
             _id: '$appId',
-            apps: { $push: '$$ROOT' },
-            shareId: { $first: '$shareId' },
-            name: { $first: '$name' }
+            apps: {$push: '$$ROOT'},
+            shareId: {$first: '$shareId'},
+            name: {$first: '$name'}
           }
         },
         {
@@ -462,11 +464,11 @@ export async function getServerSideProps(context: any) {
             as: 'appDetails'
           }
         },
-        { $unwind: '$appDetails' },
+        {$unwind: '$appDetails'},
         {
           $project: {
             _id: 0,
-            appId: { $toString: '$_id' },
+            appId: {$toString: '$_id'},
             appName: '$appDetails.name',
             appAvatar: '$appDetails.avatar',
             appIntro: '$appDetails.intro',
