@@ -55,7 +55,7 @@ type Props = {
   alternativeModelList?: alternativeModel[];
 };
 
-const OutLink = ({appName, appIntro, appAvatar, cardNo, alternativeModelList}: Props) => {
+const OutLink = ({appName, appIntro, appAvatar, cardNo, isLogin, alternativeModelList}: Props) => {
   const {t} = useTranslation();
   const router = useRouter();
   const {
@@ -361,12 +361,7 @@ const Render = (props: Props) => {
   let cardNo = Cookies.get('card_no') || '';
   // 判断是否登录并初始化登录权限
   const initPermissions = async () => {
-    if (!isLogin) {
-      cardNo = '';
-      setHasPermission(true);
-      return;
-    }
-    if (cardNo) {
+    if (!isLogin || cardNo) {
       setHasPermission(true);
       return;
     }
@@ -390,6 +385,10 @@ const Render = (props: Props) => {
   useEffect(() => {
     initPermissions();
   }, []);
+
+  if (!isLogin){
+    cardNo = '';
+  }
 
   const {localUId} = useShareChatStore();
   const outLinkUid: string = authToken || cardNo || localUId;
