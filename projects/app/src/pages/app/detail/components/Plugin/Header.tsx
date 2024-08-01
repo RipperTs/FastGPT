@@ -54,6 +54,7 @@ const Header = () => {
       window.location.href = '/app/list';
     } catch (error) {}
   }, [onSaveWorkflow, router]);
+
   // effect
   useBeforeunload({
     callback: onSaveWorkflow,
