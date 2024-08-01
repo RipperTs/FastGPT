@@ -372,7 +372,7 @@ const PcHeader = ({
           <MyTag ml={2} colorSchema={'green'}>
             <MyIcon name={'core/chat/chatModelTag'} w={'14px'} />
             <Box ml={1} maxW={'200px'} cursor="pointer" className="textEllipsis" onClick={onOpen}>
-              {chatModels.join(',')}
+              {chatModels[0]}
             </Box>
           </MyTag>
         </MyTooltip>
