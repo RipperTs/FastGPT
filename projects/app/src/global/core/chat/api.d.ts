@@ -53,6 +53,14 @@ export type InitChatResponse = {
   };
 };
 
+export type ChatHistoryResponse = {
+  chatId?: string;
+  appId: string;
+  userAvatar?: string;
+  title: string;
+  history: ChatItemType[];
+};
+
 /* ---------- history ----------- */
 export type GetHistoriesProps = OutLinkChatAuthProps & {
   appId?: string;
