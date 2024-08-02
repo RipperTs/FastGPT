@@ -126,7 +126,7 @@ const Logs = () => {
                     {item.title}
                   </Td>
                   <Td className="textEllipsis" maxW={'100px'}>
-                    {item.source === 'api' ? item.chatId || '-' :  item.outLinkUid || '-'}
+                    {item.outLinkUid || '-'}
                   </Td>
                   <Td>{item.messageCount}</Td>
                   <Td w={'100px'}>
