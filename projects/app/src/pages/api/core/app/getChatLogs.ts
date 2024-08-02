@@ -132,7 +132,8 @@ async function handler(
             userBadFeedbackCount: 1,
             customFeedbacksCount: 1,
             markCount: 1,
-            outLinkUid: 1
+            outLinkUid: 1,
+            chatId:1
           }
         }
       ],

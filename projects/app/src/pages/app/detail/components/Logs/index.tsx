@@ -80,7 +80,7 @@ const Logs = () => {
             </Box>
             <Box color={'myGray.500'} fontSize={'sm'}>
               <Box>{`日志会记录该应对的所有对话记录, 无论是通过分享或API形式的对话记录, 分享链接添加 authToken 参数可识别对话人及保留历史记录.`}</Box>
-              <Box>{`API 需要填写 chatId 参数来实现对话记录区分, 同时需要自行实现: 工具调用动作/历史记录展示/用户反馈等.`}</Box>
+              <Box mt={2}>{`API 需要填写 chatId 参数来实现对话记录区分, 如果需要记录用户身份可以使用 <UID>--<随机字符串> 的形式.`}</Box>
             </Box>
           </>
         )}
@@ -125,8 +125,8 @@ const Logs = () => {
                   <Td className="textEllipsis" maxW={'250px'}>
                     {item.title}
                   </Td>
-                  <Td className="textEllipsis" maxW={'80px'}>
-                    {item.outLinkUid || '-'}
+                  <Td className="textEllipsis" maxW={'100px'}>
+                    {item.source === 'api' ? item.chatId || '-' :  item.outLinkUid || '-'}
                   </Td>
                   <Td>{item.messageCount}</Td>
                   <Td w={'100px'}>

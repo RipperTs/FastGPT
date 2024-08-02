@@ -45,4 +45,5 @@ export type AppLogsListItemType = {
   customFeedbacksCount: number;
   markCount: number;
   outLinkUid: string | null;
+  chatId: string | null;
 };
