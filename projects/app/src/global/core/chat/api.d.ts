@@ -14,6 +14,7 @@ export type InitChatProps = {
   appId?: string;
   chatId?: string;
   loadCustomFeedbacks?: boolean;
+  perPage?: number;
 };
 export type InitOutLinkChatProps = {
   chatId?: string;
@@ -64,6 +65,7 @@ export type ChatHistoryResponse = {
 /* ---------- history ----------- */
 export type GetHistoriesProps = OutLinkChatAuthProps & {
   appId?: string;
+  perPage?: number;
 };
 
 export type UpdateHistoryProps = OutLinkChatAuthProps & {

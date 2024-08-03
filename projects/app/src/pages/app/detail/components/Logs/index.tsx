@@ -79,8 +79,8 @@ const Logs = () => {
               {appT('chat_logs')}
             </Box>
             <Box color={'myGray.500'} fontSize={'sm'}>
-              <Box>{`日志会记录该应对的所有对话记录, 无论是通过分享或API形式的对话记录, 分享链接添加 authToken 参数可识别对话人及保留历史记录.`}</Box>
-              <Box mt={2}>{`API 需要填写 chatId 参数来实现对话记录区分, 如果需要记录用户身份可以使用 <UID>--<随机字符串> 的形式.`}</Box>
+              <Box>{`日志会记录该应对的所有对话记录, 无论是通过分享或API形式的对话记录.`}</Box>
+              <Box mt={2}>{`API 需要传递 chatId 参数来区分对话窗口 (聊天历史记录关联), 传递 outLinkUid 参数来区分不同的使用者.`}</Box>
             </Box>
           </>
         )}
