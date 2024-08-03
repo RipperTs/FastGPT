@@ -9,8 +9,9 @@ import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import {ReadPermissionVal, WritePermissionVal} from '@fastgpt/global/support/permission/constant';
 import {parseHeaderCert} from "@fastgpt/service/support/permission/controller";
+import {ChatSourceEnum} from "@fastgpt/global/core/chat/constants";
 
-/* 删除一条历史记录 */
+/* 删除一条 API 请求生成的历史记录 */
 async function handler(req: ApiRequestProps<{}, DelHistoryProps>, res: NextApiResponse) {
   const { chatId } = req.query;
 
@@ -32,14 +33,16 @@ async function handler(req: ApiRequestProps<{}, DelHistoryProps>, res: NextApiRe
     await MongoChatItem.deleteMany(
       {
         appId,
-        chatId
+        chatId,
+        source: ChatSourceEnum.api
       },
       { session }
     );
     await MongoChat.findOneAndRemove(
       {
         appId,
-        chatId
+        chatId,
+        source: ChatSourceEnum.api
       },
       { session }
     );
