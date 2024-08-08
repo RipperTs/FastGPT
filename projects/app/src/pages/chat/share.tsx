@@ -37,6 +37,7 @@ import dynamic from 'next/dynamic';
 import {useSystem} from '@fastgpt/web/hooks/useSystem';
 import Permission from '@fastgpt/service/core/chat/Permission';
 import Cookies from 'js-cookie';
+import {MongoApp} from "@fastgpt/service/core/app/schema";
 
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 12);
 
@@ -386,7 +387,7 @@ const Render = (props: Props) => {
     initPermissions();
   }, []);
 
-  if (!isLogin){
+  if (!isLogin) {
     cardNo = '';
   }
 
@@ -436,53 +437,95 @@ export async function getServerSideProps(context: any) {
   })();
 
   const isLogin = app?.isLogin ?? false;
+  const appId = app?.appId._id;
+  // 是否加入了备选模型列表
   const alternativeModel = app?.alternativeModel ?? false;
+  let alternativeModelList: alternativeModel[] = [];
 
-  // 获取备选模型列表
-  const alternativeModelList = await (async () => {
-    try {
-      if (!alternativeModel) {
-        return [];
-      }
-      await connectToDatabase();
-      const app = (await MongoOutLink.aggregate([
-        {$match: {alternativeModel: true, isLogin: isLogin}},
-        {
-          $group: {
-            _id: '$appId',
-            apps: {$push: '$$ROOT'},
-            shareId: {$first: '$shareId'},
-            name: {$first: '$name'}
-          }
-        },
-        {
-          $lookup: {
-            from: 'apps', // Assuming the collection name for apps is 'apps'
-            localField: '_id',
-            foreignField: '_id',
-            as: 'appDetails'
-          }
-        },
-        {$unwind: '$appDetails'},
-        {
-          $project: {
-            _id: 0,
-            appId: {$toString: '$_id'},
-            appName: '$appDetails.name',
-            appAvatar: '$appDetails.avatar',
-            appIntro: '$appDetails.intro',
-            shareId: 1,
-            name: 1
-          }
+  if (alternativeModel) {
+    // 查询相应文件夹下的其他app, 用于后续备选模型列表展示
+    const directoryApps: any[] | null = await (async () => {
+      try {
+        // 查找指定 appId 的文档
+        const currentApp = await MongoApp.findById(appId);
+        if (!currentApp) {
+          return null;
         }
-      ])) as alternativeModel[];
+        const results = await MongoApp.find({parentId: currentApp.parentId}).select('_id name');
+        if (!results) {
+          return null;
+        }
 
-      // 排除掉 shareId 为当前分享的app
-      return app.filter((item) => item.shareId !== shareId);
-    } catch (error) {
-      return [];
+        const directoryAppIds: any[] = []
+        results.forEach((item) => {
+          directoryAppIds.push(item._id)
+        })
+
+        return directoryAppIds;
+
+      } catch (error) {
+        console.error('Error querying the database:', error);
+        return null;
+      }
+
+    })();
+
+    // 获取备选模型列表
+    if (directoryApps !== null) {
+      alternativeModelList = await (async () => {
+        try {
+          if (!alternativeModel) {
+            return [];
+          }
+          await connectToDatabase();
+          const app = (await MongoOutLink.aggregate([
+            {
+              $match: {
+                alternativeModel: true,
+                isLogin: isLogin,
+                appId: {
+                  $in: directoryApps
+                }
+              }
+            },
+            {
+              $group: {
+                _id: '$appId',
+                apps: {$push: '$$ROOT'},
+                shareId: {$first: '$shareId'},
+                name: {$first: '$name'}
+              }
+            },
+            {
+              $lookup: {
+                from: 'apps', // Assuming the collection name for apps is 'apps'
+                localField: '_id',
+                foreignField: '_id',
+                as: 'appDetails'
+              }
+            },
+            {$unwind: '$appDetails'},
+            {
+              $project: {
+                _id: 0,
+                appId: {$toString: '$_id'},
+                appName: '$appDetails.name',
+                appAvatar: '$appDetails.avatar',
+                appIntro: '$appDetails.intro',
+                shareId: 1,
+                name: 1
+              }
+            }
+          ])) as alternativeModel[];
+
+          // 排除掉 shareId 为当前分享的app
+          return app.filter((item) => item.shareId !== shareId);
+        } catch (error) {
+          return [];
+        }
+      })();
     }
-  })();
+  }
 
   return {
     props: {
