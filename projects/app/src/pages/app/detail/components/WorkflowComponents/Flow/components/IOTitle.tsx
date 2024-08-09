@@ -14,16 +14,6 @@ const IOTitle = ({
       <Box w={'3px'} h={'14px'} borderRadius={'13px'} bg={'primary.600'} />
       <Box>{text}</Box>
       <Box flex={1} />
-
-      {inputExplanationUrl && (
-        <Box
-          cursor={'pointer'}
-          color={'primary.500'}
-          onClick={() => window.open(inputExplanationUrl, '_blank')}
-        >
-          {t('app:workflow.Input guide')}
-        </Box>
-      )}
     </HStack>
   );
 };

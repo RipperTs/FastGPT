@@ -192,7 +192,7 @@
       "App intro": "应用介绍",
       "Chat Variable": "对话框变量",
       "Config schedule plan": "配置定时执行",
-      "Config whisper": "配置语音输入",
+      "Config whisper": "配置语音输入 (需要HTTPS)",
       "Interval timer config": "定时执行配置",
       "Interval timer run": "定时执行",
       "Interval timer tip": "可定时执行应用",

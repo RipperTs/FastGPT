@@ -76,18 +76,6 @@ const AIChatSettingsModal = ({
       title={
         <>
           {t('common:core.ai.AI settings')}
-          {feConfigs?.docUrl && (
-            <Link
-              href={getDocPath('/docs/course/ai_settings/')}
-              target={'_blank'}
-              ml={1}
-              textDecoration={'underline'}
-              fontWeight={'normal'}
-              fontSize={'md'}
-            >
-              {t('common:common.Read intro')}
-            </Link>
-          )}
         </>
       }
       w={'500px'}
@@ -109,18 +97,6 @@ const AIChatSettingsModal = ({
             />
           </Box>
         </Flex>
-        {feConfigs && (
-          <Flex mt={8}>
-            <Box {...LabelStyles} mr={2}>
-              {t('common:core.ai.Ai point price')}
-            </Box>
-            <Box flex={1} ml={'10px'}>
-              {t('support.wallet.Ai point every thousand tokens', {
-                points: selectedModel?.charsPointsPrice || 0
-              })}
-            </Box>
-          </Flex>
-        )}
         <Flex mt={8}>
           <Box {...LabelStyles} mr={2}>
             {t('common:core.ai.Max context')}
