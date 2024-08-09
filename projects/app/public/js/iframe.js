@@ -5,6 +5,10 @@ function embedChatbot() {
   const botSrc = script?.getAttribute('data-bot-src');
   const defaultOpen = script?.getAttribute('data-default-open') === 'true';
   const canDrag = script?.getAttribute('data-drag') === 'true';
+  const bottom = script?.getAttribute('data-bottom') || '30px';
+  const right = script?.getAttribute('data-right') || '60px';
+  const width = script?.getAttribute('data-width') || '40px';
+  const height = script?.getAttribute('data-height') || '40px';
   const MessageIcon =
     script?.getAttribute('data-open-icon') ||
     `data:image/svg+xml;base64,PHN2ZyB0PSIxNjkwNTMyNzg1NjY0IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQxMzIiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48cGF0aCBkPSJNNTEyIDMyQzI0Ny4wNCAzMiAzMiAyMjQgMzIgNDY0QTQxMC4yNCA0MTAuMjQgMCAwIDAgMTcyLjQ4IDc2OEwxNjAgOTY1LjEyYTI1LjI4IDI1LjI4IDAgMCAwIDM5LjA0IDIyLjRsMTY4LTExMkE1MjguNjQgNTI4LjY0IDAgMCAwIDUxMiA4OTZjMjY0Ljk2IDAgNDgwLTE5MiA0ODAtNDMyUzc3Ni45NiAzMiA1MTIgMzJ6IG0yNDQuOCA0MTZsLTM2MS42IDMwMS43NmExMi40OCAxMi40OCAwIDAgMS0xOS44NC0xMi40OGw1OS4yLTIzMy45MmgtMTYwYTEyLjQ4IDEyLjQ4IDAgMCAxLTcuMzYtMjMuMzZsMzYxLjYtMzAxLjc2YTEyLjQ4IDEyLjQ4IDAgMCAxIDE5Ljg0IDEyLjQ4bC01OS4yIDIzMy45MmgxNjBhMTIuNDggMTIuNDggMCAwIDEgOCAyMi4wOHoiIGZpbGw9IiM0ZTgzZmQiIHAtaWQ9IjQxMzMiPjwvcGF0aD48L3N2Zz4=`;
@@ -23,7 +27,7 @@ function embedChatbot() {
   const ChatBtn = document.createElement('div');
   ChatBtn.id = chatBtnId;
   ChatBtn.style.cssText =
-    'position: fixed; bottom: 30px; right: 60px; width: 40px; height: 40px; cursor: pointer; z-index: 2147483647; transition: 0;';
+    `position: fixed; bottom: ${bottom}; right: ${right}; width: ${width}; height: ${height}; cursor: pointer; z-index: 2147483647; transition: 0;`;
 
   // btn icon
   const ChatBtnDiv = document.createElement('img');
