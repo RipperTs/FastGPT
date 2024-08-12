@@ -1,6 +1,6 @@
 function embedChatbot() {
-  const chatBtnId = 'fastgpt-chatbot-button';
-  const chatWindowId = 'fastgpt-chatbot-window';
+  const chatBtnId = 'easygpts-chatbot-button';
+  const chatWindowId = 'easygpts-chatbot-window';
   const script = document.getElementById('chatbot-iframe');
   const botSrc = script?.getAttribute('data-bot-src');
   const defaultOpen = script?.getAttribute('data-default-open') === 'true';
@@ -9,6 +9,9 @@ function embedChatbot() {
   const right = script?.getAttribute('data-right') || '60px';
   const width = script?.getAttribute('data-width') || '40px';
   const height = script?.getAttribute('data-height') || '40px';
+  const windowWidth = script?.getAttribute('data-window-width') || '375px';
+  const windowHeight = script?.getAttribute('data-window-height') || '667px';
+
   const MessageIcon =
     script?.getAttribute('data-open-icon') ||
     `data:image/svg+xml;base64,PHN2ZyB0PSIxNjkwNTMyNzg1NjY0IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQxMzIiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48cGF0aCBkPSJNNTEyIDMyQzI0Ny4wNCAzMiAzMiAyMjQgMzIgNDY0QTQxMC4yNCA0MTAuMjQgMCAwIDAgMTcyLjQ4IDc2OEwxNjAgOTY1LjEyYTI1LjI4IDI1LjI4IDAgMCAwIDM5LjA0IDIyLjRsMTY4LTExMkE1MjguNjQgNTI4LjY0IDAgMCAwIDUxMiA4OTZjMjY0Ljk2IDAgNDgwLTE5MiA0ODAtNDMyUzc3Ni45NiAzMiA1MTIgMzJ6IG0yNDQuOCA0MTZsLTM2MS42IDMwMS43NmExMi40OCAxMi40OCAwIDAgMS0xOS44NC0xMi40OGw1OS4yLTIzMy45MmgtMTYwYTEyLjQ4IDEyLjQ4IDAgMCAxLTcuMzYtMjMuMzZsMzYxLjYtMzAxLjc2YTEyLjQ4IDEyLjQ4IDAgMCAxIDE5Ljg0IDEyLjQ4bC01OS4yIDIzMy45MmgxNjBhMTIuNDggMTIuNDggMCAwIDEgOCAyMi4wOHoiIGZpbGw9IiM0ZTgzZmQiIHAtaWQ9IjQxMzMiPjwvcGF0aD48L3N2Zz4=`;
@@ -43,7 +46,7 @@ function embedChatbot() {
   iframe.id = chatWindowId;
   iframe.src = botSrc;
   iframe.style.cssText =
-    'border: none; position: fixed; flex-direction: column; justify-content: space-between; box-shadow: rgba(150, 150, 150, 0.2) 0px 10px 30px 0px, rgba(150, 150, 150, 0.2) 0px 0px 0px 1px; bottom: 80px; right: 60px; width: 375px; height: 667px; max-width: 90vw; max-height: 85vh; border-radius: 0.75rem; display: flex; z-index: 2147483647; overflow: hidden; left: unset; background-color: #F3F4F6;';
+    `border: none; position: fixed; flex-direction: column; justify-content: space-between; box-shadow: rgba(150, 150, 150, 0.2) 0px 10px 30px 0px, rgba(150, 150, 150, 0.2) 0px 0px 0px 1px; bottom: 80px; right: 60px; width: ${windowWidth}; height: ${windowHeight}; max-width: 90vw; max-height: 85vh; border-radius: 0.75rem; display: flex; z-index: 2147483647; overflow: hidden; left: unset; background-color: #F3F4F6;`;
   iframe.style.visibility = defaultOpen ? 'unset' : 'hidden';
 
   document.body.appendChild(iframe);
