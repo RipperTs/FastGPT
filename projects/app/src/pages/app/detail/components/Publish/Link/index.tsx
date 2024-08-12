@@ -291,10 +291,7 @@ function EditLinkModal({
         <Flex alignItems={'center'} mt={4}>
           <Flex flex={'0 0 90px'} alignItems={'center'}>
             <FormLabel>登录地址</FormLabel>
-            <QuestionTip
-              ml={1}
-              label="此功能仅做身份识别, 无法严格校验用户权限"
-            ></QuestionTip>
+            <QuestionTip ml={1} label="此功能仅做身份识别, 无法严格校验用户权限"></QuestionTip>
           </Flex>
           <Input placeholder="SSO登录地址" fontSize={'sm'} {...register('limit.hookUrl')} />
         </Flex>

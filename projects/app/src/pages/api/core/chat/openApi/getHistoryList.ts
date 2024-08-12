@@ -1,16 +1,16 @@
-import type {NextApiRequest, NextApiResponse} from 'next';
-import {jsonRes} from '@fastgpt/service/common/response';
-import {connectToDatabase} from '@/service/mongo';
-import {MongoChat} from '@fastgpt/service/core/chat/chatSchema';
-import type {ChatHistoryItemType} from '@fastgpt/global/core/chat/type.d';
-import {ChatSourceEnum} from '@fastgpt/global/core/chat/constants';
-import {GetHistoriesProps} from '@/global/core/chat/api';
-import {ReadPermissionVal} from "@fastgpt/global/support/permission/constant";
-import {parseHeaderCert} from "@fastgpt/service/support/permission/controller";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { jsonRes } from '@fastgpt/service/common/response';
+import { connectToDatabase } from '@/service/mongo';
+import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
+import type { ChatHistoryItemType } from '@fastgpt/global/core/chat/type.d';
+import { ChatSourceEnum } from '@fastgpt/global/core/chat/constants';
+import { GetHistoriesProps } from '@/global/core/chat/api';
+import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
+import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const {outLinkUid, perPage} = req.query as GetHistoriesProps;
+    const { outLinkUid, perPage } = req.query as GetHistoriesProps;
     if (!outLinkUid) {
       return jsonRes(res, {
         code: 422,
@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
     // auth app permission
-    const {appId, authType, userId} = await parseHeaderCert({
+    const { appId, authType, userId } = await parseHeaderCert({
       req,
       authApiKey: true,
       per: ReadPermissionVal
@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })();
 
     const data = await MongoChat.find(match, 'chatId title top customTitle appId updateTime')
-      .sort({top: -1, updateTime: -1})
+      .sort({ top: -1, updateTime: -1 })
       .limit(limit);
 
     jsonRes<ChatHistoryItemType[]>(res, {

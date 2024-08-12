@@ -1,22 +1,21 @@
-import type {NextApiRequest, NextApiResponse} from 'next';
-import {jsonRes} from '@fastgpt/service/common/response';
-import {authApp} from '@fastgpt/service/support/permission/app/auth';
-import {ChatHistoryResponse, InitChatProps} from '@/global/core/chat/api';
-import {MongoChat} from '@fastgpt/service/core/chat/chatSchema';
-import {getChatItems} from '@fastgpt/service/core/chat/controller';
-import {ChatErrEnum} from '@fastgpt/global/common/error/code/chat';
-import {getAppLatestVersion} from '@fastgpt/service/core/app/controller';
-import {NextAPI} from '@/service/middleware/entry';
-import {ReadPermissionVal} from '@fastgpt/global/support/permission/constant';
-import {FlowNodeTypeEnum} from '@fastgpt/global/core/workflow/node/constant';
-import {parseHeaderCert} from "@fastgpt/service/support/permission/controller";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { jsonRes } from '@fastgpt/service/common/response';
+import { authApp } from '@fastgpt/service/support/permission/app/auth';
+import { ChatHistoryResponse, InitChatProps } from '@/global/core/chat/api';
+import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
+import { getChatItems } from '@fastgpt/service/core/chat/controller';
+import { ChatErrEnum } from '@fastgpt/global/common/error/code/chat';
+import { getAppLatestVersion } from '@fastgpt/service/core/app/controller';
+import { NextAPI } from '@/service/middleware/entry';
+import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
+import { FlowNodeTypeEnum } from '@fastgpt/global/core/workflow/node/constant';
+import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<ChatHistoryResponse | void> {
-  let {chatId, perPage, loadCustomFeedbacks} = req.query as InitChatProps;
-
+  let { chatId, perPage, loadCustomFeedbacks } = req.query as InitChatProps;
 
   if (!chatId) {
     return jsonRes(res, {
@@ -26,21 +25,21 @@ async function handler(
   }
 
   // 从header头中获取身份凭证信息
-  const {appId} = await parseHeaderCert({
+  const { appId } = await parseHeaderCert({
     req,
     authApiKey: true,
     per: ReadPermissionVal
   });
 
   // 获取应用详情信息
-  const [{app, tmbId}, chat] = await Promise.all([
+  const [{ app, tmbId }, chat] = await Promise.all([
     authApp({
       req,
       authApiKey: true,
       appId,
       per: ReadPermissionVal
     }),
-    chatId ? MongoChat.findOne({appId, chatId}) : undefined
+    chatId ? MongoChat.findOne({ appId, chatId }) : undefined
   ]);
 
   // auth chat permission
@@ -49,7 +48,7 @@ async function handler(
   }
 
   // get app and history
-  const [{histories}, {nodes}] = await Promise.all([
+  const [{ histories }, { nodes }] = await Promise.all([
     getChatItems({
       appId,
       chatId,
@@ -66,7 +65,7 @@ async function handler(
     appId,
     title: chat?.title || '新对话',
     userAvatar: undefined,
-    history: histories,
+    history: histories
   };
 }
 

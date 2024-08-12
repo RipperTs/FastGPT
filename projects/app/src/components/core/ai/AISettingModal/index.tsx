@@ -73,11 +73,7 @@ const AIChatSettingsModal = ({
       isOpen
       iconSrc="/imgs/workflow/AI.png"
       onClose={onClose}
-      title={
-        <>
-          {t('common:core.ai.AI settings')}
-        </>
-      }
+      title={<>{t('common:core.ai.AI settings')}</>}
       w={'500px'}
     >
       <ModalBody overflowY={'auto'}>

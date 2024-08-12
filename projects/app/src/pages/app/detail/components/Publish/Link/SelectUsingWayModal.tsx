@@ -106,7 +106,7 @@ const SelectUsingWayModal = ({ share, onClose }: { share: OutLinkSchema; onClose
   defer
 ></script>
 
-如果您是 Vue 项目可使用此组件: http://10.6.80.87/-/snippets/3
+如果您是 Vue 项目可以安装 npm 包: npm i @ripperts/chat-bot-component
 `
     }
   };
