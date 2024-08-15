@@ -39,17 +39,71 @@ function embedChatbot() {
   ChatBtnDiv.setAttribute('height', '100%');
   ChatBtnDiv.draggable = false;
 
+  // 创建一个容器来包裹 iframe 和调整尺寸的手柄
+  const container = document.createElement('div');
+  container.id = chatWindowId;
+  container.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    right: 60px;
+    width: ${windowWidth};
+    height: ${windowHeight};
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 0.75rem;
+    display: flex;
+    z-index: 2147483647;
+    overflow: hidden;
+    background-color: #F3F4F6;
+    box-shadow: rgba(150, 150, 150, 0.2) 0px 10px 30px 0px, rgba(150, 150, 150, 0.2) 0px 0px 0px 1px;
+    user-select: none;
+`;
+  container.style.visibility = defaultOpen ? 'unset' : 'hidden';
+
   const iframe = document.createElement('iframe');
   iframe.allow = '*';
   iframe.referrerPolicy = 'no-referrer';
   iframe.title = 'EasyGPTs Chat Window';
-  iframe.id = chatWindowId;
   iframe.src = botSrc;
-  iframe.style.cssText =
-    `border: none; position: fixed; flex-direction: column; justify-content: space-between; box-shadow: rgba(150, 150, 150, 0.2) 0px 10px 30px 0px, rgba(150, 150, 150, 0.2) 0px 0px 0px 1px; bottom: 80px; right: 60px; width: ${windowWidth}; height: ${windowHeight}; max-width: 90vw; max-height: 85vh; border-radius: 0.75rem; display: flex; z-index: 2147483647; overflow: hidden; left: unset; background-color: #F3F4F6;`;
-  iframe.style.visibility = defaultOpen ? 'unset' : 'hidden';
+  iframe.style.cssText = `
+    border: none;
+    width: 100%;
+    height: 100%;
+    border-radius: 0.75rem;
+    user-select: none;
+  `;
 
-  document.body.appendChild(iframe);
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        z-index: 1;
+    `;
+
+  // 创建调整尺寸的手柄
+  const resizeHandle = document.createElement('div');
+  resizeHandle.style.cssText = `
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    cursor: ne-resize;
+    border-radius: 0 0.75rem 0 0;
+  `;
+
+  // 将 iframe 和调整尺寸的手柄添加到容器中
+  container.appendChild(iframe);
+  container.appendChild(overlay);
+  container.appendChild(resizeHandle);
+
+  // 将容器添加到 body 中
+  document.body.appendChild(container);
 
   let chatBtnDragged = false;
   let chatBtnDown = false;
@@ -101,5 +155,44 @@ function embedChatbot() {
 
   ChatBtn.appendChild(ChatBtnDiv);
   document.body.appendChild(ChatBtn);
+
+  // 添加调整尺寸的功能
+  let isResizing = false;
+  let originalWidth, originalHeight, originalX, originalY;
+
+  resizeHandle.addEventListener('mousedown', initResize, false);
+
+  function initResize(e) {
+    isResizing = true;
+    originalWidth = parseFloat(getComputedStyle(container, null).getPropertyValue('width').replace('px', ''));
+    originalHeight = parseFloat(getComputedStyle(container, null).getPropertyValue('height').replace('px', ''));
+    originalX = e.clientX;
+    originalY = e.clientY;
+    overlay.style.display = 'block';  // 显示覆盖层
+    window.addEventListener('mousemove', resize, false);
+    window.addEventListener('mouseup', stopResize, false);
+    e.preventDefault();  // 防止文本选择
+  }
+
+  function resize(e) {
+    if (!isResizing) return;
+    const width = originalWidth + (e.clientX - originalX);
+    const height = originalHeight - (e.clientY - originalY);
+
+    container.style.width = Math.max(width, 200) + 'px';  // 设置最小宽度为 200px
+    container.style.height = Math.max(height, 200) + 'px';  // 设置最小高度为 200px
+  }
+
+  function stopResize() {
+    if (!isResizing) return;
+    isResizing = false;
+    overlay.style.display = 'none';  // 隐藏覆盖层
+    window.removeEventListener('mousemove', resize, false);
+    window.removeEventListener('mouseup', stopResize, false);
+  }
+  // 添加这个新的事件监听器
+  overlay.addEventListener('mouseup', stopResize, false);
 }
-window.addEventListener('load', embedChatbot);
+
+// 下一次浏览器重绘之前调用指定的函数, 达到快速加载的效果
+requestAnimationFrame(embedChatbot);
