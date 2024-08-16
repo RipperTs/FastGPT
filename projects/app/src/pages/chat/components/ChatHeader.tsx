@@ -367,7 +367,7 @@ const PcHeader = ({
         </Box>
       </MyTag>
       {/* 当前模型名称 */}
-      {!!chatModels && chatModels.length > 0 && (
+      {!!chatModels && chatModels.length > 0 && !!alternativeModelList && alternativeModelList.length > 0 && (
         <MyTooltip label="使用的 AI 模型, 点击可切换其他应用和模型">
           <MyTag ml={2} colorSchema={'green'}>
             <MyIcon name={'core/chat/chatModelTag'} w={'14px'} />
