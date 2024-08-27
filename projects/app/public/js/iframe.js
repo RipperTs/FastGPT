@@ -11,6 +11,7 @@ function embedChatbot() {
   const height = script?.getAttribute('data-height') || '40px';
   const windowWidth = script?.getAttribute('data-window-width') || '375px';
   const windowHeight = script?.getAttribute('data-window-height') || '667px';
+  const showBot = script?.getAttribute('data-show-bot') === 'true';
 
   const MessageIcon =
     script?.getAttribute('data-open-icon') ||
@@ -31,6 +32,10 @@ function embedChatbot() {
   ChatBtn.id = chatBtnId;
   ChatBtn.style.cssText =
     `position: fixed; bottom: ${bottom}; right: ${right}; width: ${width}; height: ${height}; cursor: pointer; z-index: 2147483647; transition: 0;`;
+
+  if (showBot) {
+    ChatBtn.style.cssText += `display: none;`;
+  }
 
   // btn icon
   const ChatBtnDiv = document.createElement('img');
