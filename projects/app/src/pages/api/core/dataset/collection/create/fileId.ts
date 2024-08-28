@@ -21,8 +21,13 @@ import { rawText2Chunks } from '@fastgpt/service/core/dataset/read';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { WritePermissionVal } from '@fastgpt/global/support/permission/constant';
+import { jsonRes } from '@fastgpt/service/common/response';
+import type { NextApiResponse } from 'next';
 
-async function handler(req: ApiRequestProps<FileIdCreateDatasetCollectionParams>) {
+async function handler(
+  req: ApiRequestProps<FileIdCreateDatasetCollectionParams>,
+  res: NextApiResponse<any>
+) {
   const {
     fileId,
     trainingType = TrainingModeEnum.chunk,
@@ -132,7 +137,9 @@ async function handler(req: ApiRequestProps<FileIdCreateDatasetCollectionParams>
 
     // remove buffer
     await MongoRawTextBuffer.deleteOne({ sourceId: fileId });
-    return collectionId;
+    jsonRes(res, {
+      data: collectionId
+    });
   });
 }
 

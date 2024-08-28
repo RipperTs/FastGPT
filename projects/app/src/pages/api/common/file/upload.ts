@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     filePaths.push(file.path);
 
-    const { teamId, tmbId } = await authCert({ req, authToken: true });
+    const { teamId, tmbId } = await authCert({ req, authToken: true, authRoot: true });
 
     if (!bucketName) {
       throw new Error('bucketName is empty');
