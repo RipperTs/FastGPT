@@ -290,29 +290,6 @@ const NodeTemplatesModal = ({ isOpen, onClose }: ModuleTemplateListProps) => {
                 onClick={onClose}
               />
             </Flex>
-            {/* Search */}
-            {(templateType === TemplateTypeEnum.teamPlugin ||
-              templateType === TemplateTypeEnum.systemPlugin) && (
-              <Flex mt={2} alignItems={'center'} h={10}>
-                <InputGroup mr={4} h={'full'}>
-                  <InputLeftElement h={'full'} alignItems={'center'} display={'flex'}>
-                    <MyIcon name={'common/searchLight'} w={'16px'} color={'myGray.500'} ml={3} />
-                  </InputLeftElement>
-                  <Input
-                    h={'full'}
-                    bg={'myGray.50'}
-                    placeholder={
-                      templateType === TemplateTypeEnum.teamPlugin
-                        ? t('common:plugin.Search_app')
-                        : t('common:plugin.Search plugin')
-                    }
-                    onChange={(e) => setSearchKey(e.target.value)}
-                  />
-                </InputGroup>
-                <Box flex={1} />
-                {/* 系统插件菜单列表 */}
-              </Flex>
-            )}
             {/* paths */}
             {(templateType === TemplateTypeEnum.teamPlugin ||
               templateType === TemplateTypeEnum.systemPlugin) &&
@@ -581,11 +558,6 @@ const RenderList = React.memo(function RenderList({
                         <Box color={'myGray.900'} fontWeight={'500'} fontSize={'sm'} flex={'1 0 0'}>
                           {t(template.name as any)}
                         </Box>
-                        {gridStyle.authorInName && template.author !== undefined && (
-                          <Box fontSize={'xs'} mt={0.5} color={'myGray.500'}>
-                            {`by ${template.author || feConfigs.systemTitle}`}
-                          </Box>
-                        )}
                       </Box>
 
                       {gridStyle.authorInRight && template.authorAvatar && template.author && (

@@ -25,7 +25,6 @@ import { AI_POINT_USAGE_CARD_ROUTE } from '@/web/support/wallet/sub/constants';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 const StandDetailModal = dynamic(() => import('./standardDetailModal'));
-const PayModal = dynamic(() => import('./PayModal'));
 const UpdatePswModal = dynamic(() => import('./UpdatePswModal'));
 const Account = () => {
   const { isPc } = useSystem();
@@ -217,7 +216,6 @@ const MyInfo = () => {
           </Flex>
         )}
       </Box>
-      {isOpenPayModal && <PayModal onClose={onClosePayModal} />}
       {isOpenUpdatePsw && <UpdatePswModal onClose={onCloseUpdatePsw} />}
       <File onSelect={onSelectFile} />
     </Box>

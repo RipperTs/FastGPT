@@ -71,22 +71,20 @@ const Logs = () => {
   const [detailLogsId, setDetailLogsId] = useState<string>();
 
   return (
-    <>
-      <Box {...cardStyles} boxShadow={2} px={[4, 8]} py={[4, 6]}>
-        {isPc && (
-          <>
-            <Box fontWeight={'bold'} fontSize={['md', 'lg']} mb={2}>
-              {appT('chat_logs')}
-            </Box>
-            <Box color={'myGray.500'} fontSize={'sm'}>
-              <Box>{`日志会记录该应对的所有对话记录, 无论是通过分享或API形式的对话记录.`}</Box>
-              <Box
-                mt={2}
-              >{`API 需要传递 chatId 参数来区分对话窗口 (聊天历史记录关联), 传递 outLinkUid 参数来区分不同的使用者.`}</Box>
-            </Box>
-          </>
-        )}
-      </Box>
+    <Flex flexDirection={'column'} h={'100%'}>
+      {isPc && (
+        <Box {...cardStyles} boxShadow={2} px={[4, 8]} py={[4, 6]}>
+          <Box fontWeight={'bold'} fontSize={['md', 'lg']} mb={2}>
+            {appT('chat_logs')}
+          </Box>
+          <Box color={'myGray.500'} fontSize={'sm'}>
+            <Box>{`日志会记录该应对的所有对话记录, 无论是通过分享或API形式的对话记录.`}</Box>
+            <Box
+              mt={2}
+            >{`API 需要传递 chatId 参数来区分对话窗口 (聊天历史记录关联), 传递 outLinkUid 参数来区分不同的使用者.`}</Box>
+          </Box>
+        </Box>
+      )}
 
       {/* table */}
       <Flex
@@ -212,7 +210,7 @@ const Logs = () => {
       >
         <ModalBody whiteSpace={'pre-wrap'}>{t('common:core.chat.Mark Description')}</ModalBody>
       </MyModal>
-    </>
+    </Flex>
   );
 };
 

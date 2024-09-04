@@ -257,7 +257,6 @@ const CreateModal = ({
                 {t(item.intro as any)}
               </Box>
               <Box w={'full'} fontSize={'mini'}>
-                <Box color={'myGray.500'}>By {item.author}</Box>
                 <Box
                   className="buttons"
                   display={'none'}

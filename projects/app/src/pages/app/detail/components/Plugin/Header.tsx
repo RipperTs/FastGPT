@@ -23,7 +23,6 @@ import AppCard from '../WorkflowComponents/AppCard';
 import { uiWorkflow2StoreWorkflow } from '../WorkflowComponents/utils';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
-const PublishHistories = dynamic(() => import('../PublishHistoriesSlider'));
 import MyPopover from '@fastgpt/web/components/common/MyPopover';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
