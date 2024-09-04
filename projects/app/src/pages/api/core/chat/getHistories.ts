@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await connectToDatabase();
     const { appId, shareId, outLinkUid, teamId, teamToken } = req.body as GetHistoriesProps;
 
-    const limit = shareId && outLinkUid ? 50 : 30;
+    const limit = shareId && outLinkUid ? 100 : 30;
 
     const match = await (async () => {
       if (shareId && outLinkUid) {
@@ -23,10 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return {
           shareId,
           outLinkUid: uid,
-          source: ChatSourceEnum.share,
-          updateTime: {
-            $gte: new Date(new Date().setDate(new Date().getDate() - 30))
-          }
+          source: ChatSourceEnum.share
         };
       }
       if (appId && teamId && teamToken) {

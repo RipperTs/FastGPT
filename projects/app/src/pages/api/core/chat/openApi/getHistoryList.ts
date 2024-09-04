@@ -32,10 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return {
         outLinkUid: outLinkUid,
         appId: appId,
-        source: ChatSourceEnum.api,
-        updateTime: {
-          $gte: new Date(new Date().setDate(new Date().getDate() - 30))
-        }
+        source: ChatSourceEnum.api
       };
     })();
 
