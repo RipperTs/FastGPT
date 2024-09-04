@@ -70,15 +70,7 @@ const OutLink = () => {
           list={publishList.current}
           value={linkType}
           onChange={(e) => {
-            const config = publishList.current.find((v) => v.value === e)!;
-            if (!feConfigs.isPlus && config.isProFn) {
-              toast({
-                status: 'warning',
-                title: t('common:common.system.Commercial version function')
-              });
-            } else {
-              setLinkType(e as PublishChannelEnum);
-            }
+            setLinkType(e as PublishChannelEnum);
           }}
         />
       </Box>

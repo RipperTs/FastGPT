@@ -159,15 +159,15 @@ const Wecom = ({ appId }: { appId: string }) => {
                             label: t('common:common.Edit'),
                             icon: 'edit',
                             onClick: () => {
-                              setEditWecomData({
-                                _id: item._id,
-                                name: item.name,
-                                limit: item.limit,
-                                app: item.app,
-                                responseDetail: item.responseDetail,
-                                defaultResponse: item.defaultResponse,
-                                immediateResponse: item.immediateResponse
-                              });
+                              // setEditWecomData({
+                              //   _id: item._id,
+                              //   name: item.name,
+                              //   limit: item.limit,
+                              //   app: item.app,
+                              //   responseDetail: item.responseDetail,
+                              //   defaultResponse: item.defaultResponse,
+                              //   immediateResponse: item.immediateResponse
+                              // });
                               setIsEdit(true);
                             }
                           },
