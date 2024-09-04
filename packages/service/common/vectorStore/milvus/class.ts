@@ -213,19 +213,50 @@ export class MilvusCtrl {
   };
   embRecall = async (props: EmbeddingRecallCtrlProps): Promise<EmbeddingRecallResponse> => {
     const client = await this.getClient();
-    const { teamId, datasetIds, vector, limit, forbidCollectionIdList, retry = 2 } = props;
+    const {
+      teamId,
+      datasetIds,
+      vector,
+      limit,
+      forbidCollectionIdList,
+      filterCollectionIdList,
+      retry = 2
+    } = props;
 
+    // Forbid collection
+    const formatForbidCollectionIdList = (() => {
+      if (!filterCollectionIdList) return forbidCollectionIdList;
+      const list = forbidCollectionIdList
+        .map((id) => String(id))
+        .filter((id) => !filterCollectionIdList.includes(id));
+      return list;
+    })();
     const forbidColQuery =
-      forbidCollectionIdList.length > 0
-        ? `and (collectionId not in [${forbidCollectionIdList.map((id) => `"${String(id)}"`).join(',')}])`
+      formatForbidCollectionIdList.length > 0
+        ? `and (collectionId not in [${formatForbidCollectionIdList.map((id) => `"${id}"`).join(',')}])`
         : '';
+
+    // filter collection id
+    const formatFilterCollectionId = (() => {
+      if (!filterCollectionIdList) return;
+      return filterCollectionIdList
+        .map((id) => String(id))
+        .filter((id) => !forbidCollectionIdList.includes(id));
+    })();
+    const collectionIdQuery = formatFilterCollectionId
+      ? `and (collectionId in [${formatFilterCollectionId.map((id) => `"${id}"`)}])`
+      : ``;
+    // Empty data
+    if (formatFilterCollectionId && formatFilterCollectionId.length === 0) {
+      return { results: [] };
+    }
 
     try {
       const { results } = await client.search({
         collection_name: DatasetVectorTableName,
         data: vector,
         limit,
-        filter: `(teamId == "${teamId}") and (datasetId in [${datasetIds.map((id) => `"${String(id)}"`).join(',')}]) ${forbidColQuery}`,
+        filter: `(teamId == "${teamId}") and (datasetId in [${datasetIds.map((id) => `"${id}"`).join(',')}]) ${collectionIdQuery} ${forbidColQuery}`,
         output_fields: ['collectionId']
       });
 
@@ -266,6 +297,20 @@ export class MilvusCtrl {
 
     return total;
   };
+  getVectorCountByDatasetId = async (teamId: string, datasetId: string) => {
+    const client = await this.getClient();
+
+    const result = await client.query({
+      collection_name: DatasetVectorTableName,
+      output_fields: ['count(*)'],
+      filter: `(teamId == "${String(teamId)}") and (dataset == "${String(datasetId)}")`
+    });
+
+    const total = result.data?.[0]?.['count(*)'] as number;
+
+    return total;
+  };
+
   getVectorDataByTime = async (start: Date, end: Date) => {
     const client = await this.getClient();
     const startTimestamp = new Date(start).getTime();

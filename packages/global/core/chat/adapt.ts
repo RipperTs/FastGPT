@@ -56,16 +56,21 @@ export const chats2GPTMessages = ({
               text: item.text?.content || ''
             };
           }
-          if (
-            item.type === ChatItemValueTypeEnum.file &&
-            item.file?.type === ChatFileTypeEnum.image
-          ) {
-            return {
-              type: 'image_url',
-              image_url: {
+          if (item.type === ChatItemValueTypeEnum.file) {
+            if (item.file?.type === ChatFileTypeEnum.image) {
+              return {
+                type: 'image_url',
+                image_url: {
+                  url: item.file?.url || ''
+                }
+              };
+            } else if (item.file?.type === ChatFileTypeEnum.file) {
+              return {
+                type: 'file_url',
+                name: item.file?.name || '',
                 url: item.file?.url || ''
-              }
-            };
+              };
+            }
           }
         })
         .filter(Boolean) as ChatCompletionContentPart[];
@@ -113,11 +118,18 @@ export const chats2GPTMessages = ({
               tool_calls
             })
             .concat(toolResponse);
-        } else if (value.text) {
+        } else if (value.text?.content) {
           results.push({
             dataId,
             role: ChatCompletionRequestMessageRoleEnum.Assistant,
             content: value.text.content
+          });
+        } else if (value.type === ChatItemValueTypeEnum.interactive) {
+          results = results.concat({
+            dataId,
+            role: ChatCompletionRequestMessageRoleEnum.Assistant,
+            interactive: value.interactive,
+            content: ''
           });
         }
       });
@@ -130,7 +142,7 @@ export const GPTMessages2Chats = (
   messages: ChatCompletionMessageParam[],
   reserveTool = true
 ): ChatItemType[] => {
-  return messages
+  const chatMessages = messages
     .map((item) => {
       const value: ChatItemType['value'] = [];
       const obj = GPT2Chat[item.role];
@@ -139,12 +151,23 @@ export const GPTMessages2Chats = (
         obj === ChatRoleEnum.System &&
         item.role === ChatCompletionRequestMessageRoleEnum.System
       ) {
-        value.push({
-          type: ChatItemValueTypeEnum.text,
-          text: {
-            content: item.content
-          }
-        });
+        if (Array.isArray(item.content)) {
+          item.content.forEach((item) => [
+            value.push({
+              type: ChatItemValueTypeEnum.text,
+              text: {
+                content: item.text
+              }
+            })
+          ]);
+        } else {
+          value.push({
+            type: ChatItemValueTypeEnum.text,
+            text: {
+              content: item.content
+            }
+          });
+        }
       } else if (
         obj === ChatRoleEnum.Human &&
         item.role === ChatCompletionRequestMessageRoleEnum.User
@@ -173,6 +196,16 @@ export const GPTMessages2Chats = (
                   type: ChatFileTypeEnum.image,
                   name: '',
                   url: item.image_url.url
+                }
+              });
+            } else if (item.type === 'file_url') {
+              value.push({
+                // @ts-ignore
+                type: ChatItemValueTypeEnum.file,
+                file: {
+                  type: ChatFileTypeEnum.file,
+                  name: item.name,
+                  url: item.url
                 }
               });
             }
@@ -239,6 +272,12 @@ export const GPTMessages2Chats = (
               ]
             });
           }
+        } else if (item.interactive) {
+          value.push({
+            //@ts-ignore
+            type: ChatItemValueTypeEnum.interactive,
+            interactive: item.interactive
+          });
         }
       }
 
@@ -249,6 +288,22 @@ export const GPTMessages2Chats = (
       } as ChatItemType;
     })
     .filter((item) => item.value.length > 0);
+
+  // Merge data with the same dataId
+  const result = chatMessages.reduce((result: ChatItemType[], currentItem) => {
+    const lastItem = result[result.length - 1];
+
+    if (lastItem && lastItem.dataId === currentItem.dataId && lastItem.obj === currentItem.obj) {
+      // @ts-ignore
+      lastItem.value = lastItem.value.concat(currentItem.value);
+    } else {
+      result.push(currentItem);
+    }
+
+    return result;
+  }, []);
+
+  return result;
 };
 
 export const chatValue2RuntimePrompt = (value: ChatItemValueItemType[]): RuntimeUserPromptType => {

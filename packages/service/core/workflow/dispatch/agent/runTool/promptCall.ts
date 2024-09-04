@@ -8,11 +8,7 @@ import {
   ChatCompletionAssistantMessageParam
 } from '@fastgpt/global/core/ai/type';
 import { NextApiResponse } from 'next';
-import {
-  responseWrite,
-  responseWriteController,
-  responseWriteNodeStatus
-} from '../../../../../common/response';
+import { responseWriteController } from '../../../../../common/response';
 import { SseResponseEventEnum } from '@fastgpt/global/core/workflow/runtime/constants';
 import { textAdaptGptResponse } from '@fastgpt/global/core/workflow/runtime/utils';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
@@ -20,10 +16,17 @@ import { dispatchWorkFlow } from '../../index';
 import { DispatchToolModuleProps, RunToolResponse, ToolNodeItemType } from './type.d';
 import json5 from 'json5';
 import { countGptMessagesTokens } from '../../../../../common/string/tiktoken/index';
-import { getNanoid, replaceVariable, sliceJsonStr } from '@fastgpt/global/common/string/tools';
+import {
+  getNanoid,
+  replaceVariable,
+  sliceJsonStr,
+  sliceStrStartEnd
+} from '@fastgpt/global/common/string/tools';
 import { AIChatItemType } from '@fastgpt/global/core/chat/type';
 import { GPTMessages2Chats } from '@fastgpt/global/core/chat/adapt';
 import { updateToolInputValue } from './utils';
+import { computedMaxToken, computedTemperature } from '../../../../ai/utils';
+import { WorkflowResponseType } from '../../type';
 
 type FunctionCallCompletion = {
   id: string;
@@ -43,7 +46,18 @@ export const runToolWithPromptCall = async (
   },
   response?: RunToolResponse
 ): Promise<RunToolResponse> => {
-  const { toolModel, toolNodes, messages, res, runtimeNodes, detail = false, node, stream } = props;
+  const {
+    toolModel,
+    toolNodes,
+    messages,
+    res,
+    requestOrigin,
+    runtimeNodes,
+    node,
+    stream,
+    workflowStreamResponse,
+    params: { temperature = 0, maxToken = 4000, aiChatVision }
+  } = props;
   const assistantResponses = response?.assistantResponses || [];
 
   const toolsPrompt = JSON.stringify(
@@ -77,7 +91,7 @@ export const runToolWithPromptCall = async (
 
   const lastMessage = messages[messages.length - 1];
   if (typeof lastMessage.content !== 'string') {
-    return Promise.reject('暂时只支持纯文本');
+    return Promise.reject('Prompt call invalid input');
   }
   lastMessage.content = replaceVariable(lastMessage.content, {
     toolsPrompt
@@ -87,35 +101,48 @@ export const runToolWithPromptCall = async (
     messages,
     maxTokens: toolModel.maxContext - 500 // filter token. not response maxToken
   });
-  const requestMessages = await loadRequestMessages(filterMessages);
+  const [requestMessages, max_tokens] = await Promise.all([
+    loadRequestMessages({
+      messages: filterMessages,
+      useVision: toolModel.vision && aiChatVision,
+      origin: requestOrigin
+    }),
+    computedMaxToken({
+      model: toolModel,
+      maxToken,
+      filterMessages
+    })
+  ]);
+  const requestBody = {
+    ...toolModel?.defaultConfig,
+    model: toolModel.model,
+    temperature: computedTemperature({
+      model: toolModel,
+      temperature
+    }),
+    max_tokens,
+    stream,
+    messages: requestMessages
+  };
 
-  // console.log(JSON.stringify(filterMessages, null, 2));
+  // console.log(JSON.stringify(requestBody, null, 2));
   /* Run llm */
   const ai = getAIApi({
     timeout: 480000
   });
-  const aiResponse = await ai.chat.completions.create(
-    {
-      ...toolModel?.defaultConfig,
-      model: toolModel.model,
-      temperature: 0,
-      stream,
-      messages: requestMessages
-    },
-    {
-      headers: {
-        Accept: 'application/json, text/plain, */*'
-      }
+  const aiResponse = await ai.chat.completions.create(requestBody, {
+    headers: {
+      Accept: 'application/json, text/plain, */*'
     }
-  );
+  });
 
   const answer = await (async () => {
     if (res && stream) {
       const { answer } = await streamResponse({
         res,
-        detail,
         toolNodes,
-        stream: aiResponse
+        stream: aiResponse,
+        workflowStreamResponse
       });
 
       return answer;
@@ -129,9 +156,8 @@ export const runToolWithPromptCall = async (
   const { answer: replaceAnswer, toolJson } = parseAnswer(answer);
   // No tools
   if (!toolJson) {
-    if (replaceAnswer === ERROR_TEXT && stream && detail) {
-      responseWrite({
-        res,
+    if (replaceAnswer === ERROR_TEXT) {
+      workflowStreamResponse?.({
         event: SseResponseEventEnum.answer,
         data: textAdaptGptResponse({
           text: replaceAnswer
@@ -176,22 +202,19 @@ export const runToolWithPromptCall = async (
     })();
 
     // SSE response to client
-    if (stream && detail) {
-      responseWrite({
-        res,
-        event: SseResponseEventEnum.toolCall,
-        data: JSON.stringify({
-          tool: {
-            id: toolJson.id,
-            toolName: toolNode.name,
-            toolAvatar: toolNode.avatar,
-            functionName: toolJson.name,
-            params: toolJson.arguments,
-            response: ''
-          }
-        })
-      });
-    }
+    workflowStreamResponse?.({
+      event: SseResponseEventEnum.toolCall,
+      data: {
+        tool: {
+          id: toolJson.id,
+          toolName: toolNode.name,
+          toolAvatar: toolNode.avatar,
+          functionName: toolJson.name,
+          params: toolJson.arguments,
+          response: ''
+        }
+      }
+    });
 
     const moduleRunResponse = await dispatchWorkFlow({
       ...props,
@@ -215,21 +238,18 @@ export const runToolWithPromptCall = async (
       return moduleRunResponse.toolResponses ? String(moduleRunResponse.toolResponses) : 'none';
     })();
 
-    if (stream && detail) {
-      responseWrite({
-        res,
-        event: SseResponseEventEnum.toolResponse,
-        data: JSON.stringify({
-          tool: {
-            id: toolJson.id,
-            toolName: '',
-            toolAvatar: '',
-            params: '',
-            response: stringToolResponse
-          }
-        })
-      });
-    }
+    workflowStreamResponse?.({
+      event: SseResponseEventEnum.toolResponse,
+      data: {
+        tool: {
+          id: toolJson.id,
+          toolName: '',
+          toolAvatar: '',
+          params: '',
+          response: sliceStrStartEnd(stringToolResponse, 500, 500)
+        }
+      }
+    });
 
     return {
       moduleRunResponse,
@@ -237,10 +257,14 @@ export const runToolWithPromptCall = async (
     };
   })();
 
-  if (stream && detail) {
-    responseWriteNodeStatus({
-      res,
-      name: node.name
+  // Run tool status
+  if (node.showStatus) {
+    workflowStreamResponse?.({
+      event: SseResponseEventEnum.flowNodeStatus,
+      data: {
+        status: 'running',
+        name: node.name
+      }
     });
   }
 
@@ -250,7 +274,7 @@ export const runToolWithPromptCall = async (
     function_call: toolJson
   };
   const concatToolMessages = [
-    ...filterMessages,
+    ...requestMessages,
     assistantToolMsgParams
   ] as ChatCompletionMessageParam[];
   const tokens = await countGptMessagesTokens(concatToolMessages, undefined);
@@ -310,13 +334,13 @@ ANSWER: `;
 
 async function streamResponse({
   res,
-  detail,
-  stream
+  stream,
+  workflowStreamResponse
 }: {
   res: NextApiResponse;
-  detail: boolean;
   toolNodes: ToolNodeItemType[];
   stream: StreamChatType;
+  workflowStreamResponse?: WorkflowResponseType;
 }) {
   const write = responseWriteController({
     res,
@@ -335,14 +359,14 @@ async function streamResponse({
     const responseChoice = part.choices?.[0]?.delta;
     // console.log(responseChoice, '---===');
 
-    if (responseChoice.content) {
+    if (responseChoice?.content) {
       const content = responseChoice?.content || '';
       textAnswer += content;
 
       if (startResponseWrite) {
-        responseWrite({
+        workflowStreamResponse?.({
           write,
-          event: detail ? SseResponseEventEnum.answer : undefined,
+          event: SseResponseEventEnum.answer,
           data: textAdaptGptResponse({
             text: content
           })
@@ -354,9 +378,9 @@ async function streamResponse({
           // find first : index
           const firstIndex = textAnswer.indexOf(':');
           textAnswer = textAnswer.substring(firstIndex + 1).trim();
-          responseWrite({
+          workflowStreamResponse?.({
             write,
-            event: detail ? SseResponseEventEnum.answer : undefined,
+            event: SseResponseEventEnum.answer,
             data: textAdaptGptResponse({
               text: textAnswer
             })
@@ -381,6 +405,7 @@ const parseAnswer = (
   str = str.trim();
   // 首先，使用正则表达式提取TOOL_ID和TOOL_ARGUMENTS
   const prefixReg = /^1(:|：)/;
+  const answerPrefixReg = /^0(:|：)/;
 
   if (prefixReg.test(str)) {
     const toolString = sliceJsonStr(str);
@@ -402,7 +427,7 @@ const parseAnswer = (
     }
   } else {
     return {
-      answer: str
+      answer: str.replace(answerPrefixReg, '')
     };
   }
 };

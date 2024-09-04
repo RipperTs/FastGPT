@@ -2,13 +2,7 @@ import { useUserStore } from '@/web/support/user/useUserStore';
 import React from 'react';
 import type { StartChatFnProps } from '@/components/core/chat/ChatContainer/type';
 import { streamFetch } from '@/web/common/api/fetch';
-import { checkChatSupportSelectFileByModules } from '@/web/core/chat/utils';
-import {
-  getDefaultEntryNodeIds,
-  getMaxHistoryLimitFromNodes,
-  initWorkflowEdgeStatus,
-  storeNodes2RuntimeNodes
-} from '@fastgpt/global/core/workflow/runtime/utils';
+import { getMaxHistoryLimitFromNodes } from '@fastgpt/global/core/workflow/runtime/utils';
 import { useMemoizedFn } from 'ahooks';
 import { useContextSelector } from 'use-context-selector';
 import { AppContext } from './context';
@@ -47,11 +41,12 @@ export const useChatTest = ({
         data: {
           // Send histories and user messages
           messages: messages.slice(-historyMaxLen - 2),
-          nodes: storeNodes2RuntimeNodes(nodes, getDefaultEntryNodeIds(nodes)),
-          edges: initWorkflowEdgeStatus(edges),
+          nodes,
+          edges,
           variables,
           appId: appDetail._id,
-          appName: `调试-${appDetail.name}`
+          appName: `调试-${appDetail.name}`,
+          chatConfig
         },
         onMessage: generatingMessage,
         abortCtrl: controller
@@ -82,6 +77,7 @@ export const useChatTest = ({
           histories={chatRecords}
           setHistories={setChatRecords}
           appId={appDetail._id}
+          chatConfig={appDetail.chatConfig}
           tab={pluginRunTab}
           setTab={setPluginRunTab}
           onNewChat={clearChatRecords}
@@ -99,7 +95,6 @@ export const useChatTest = ({
         userAvatar={userInfo?.avatar}
         showMarkIcon
         chatConfig={chatConfig}
-        showFileSelector={checkChatSupportSelectFileByModules(nodes)}
         onStartChat={startChat}
         onDelMessage={() => {}}
       />

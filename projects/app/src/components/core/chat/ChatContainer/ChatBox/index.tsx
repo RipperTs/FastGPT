@@ -33,14 +33,19 @@ import type { AdminMarkType } from './components/SelectMarkCollection';
 import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
 
 import { postQuestionGuide } from '@/web/core/ai/api';
-import type { ComponentRef, ChatBoxInputType, ChatBoxInputFormType } from './type.d';
+import type {
+  ComponentRef,
+  ChatBoxInputType,
+  ChatBoxInputFormType,
+  SendPromptFnType
+} from './type.d';
 import type { StartChatFnProps, generatingMessageProps } from '../type';
 import ChatInput from './Input/ChatInput';
 import ChatBoxDivider from '../../Divider';
 import { OutLinkChatAuthProps } from '@fastgpt/global/support/permission/chat';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { ChatItemValueTypeEnum, ChatRoleEnum } from '@fastgpt/global/core/chat/constants';
-import { formatChatValue2InputType } from './utils';
+import { checkIsInteractiveByHistories, formatChatValue2InputType } from './utils';
 import { textareaMinH } from './constants';
 import { SseResponseEventEnum } from '@fastgpt/global/core/workflow/runtime/constants';
 import ChatProvider, { ChatBoxContext, ChatProviderProps } from './Provider';
@@ -52,6 +57,7 @@ import type { StreamResponseType } from '@/web/common/api/fetch';
 import { useContextSelector } from 'use-context-selector';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { useThrottleFn } from 'ahooks';
+import MyIcon from '@fastgpt/web/components/common/Icon';
 
 const ResponseTags = dynamic(() => import('./components/ResponseTags'));
 const FeedbackModal = dynamic(() => import('./components/FeedbackModal'));
@@ -74,7 +80,6 @@ type Props = OutLinkChatAuthProps &
     showVoiceIcon?: boolean;
     showEmptyIntro?: boolean;
     userAvatar?: string;
-    showFileSelector?: boolean;
     active?: boolean; // can use
     appId: string;
 
@@ -104,7 +109,6 @@ const ChatBox = (
     showEmptyIntro = false,
     appAvatar,
     userAvatar,
-    showFileSelector,
     active = true,
     appId,
     chatId,
@@ -151,6 +155,12 @@ const ChatBox = (
     variablesForm,
     isChatting
   } = useContextSelector(ChatBoxContext, (v) => v);
+
+  // Workflow running, there are user input or selection
+  const isInteractive = useMemo(
+    () => checkIsInteractiveByHistories(chatHistories),
+    [chatHistories]
+  );
 
   // compute variable input is finish.
   const chatForm = useForm<ChatBoxInputFormType>({
@@ -202,6 +212,7 @@ const ChatBox = (
       status,
       name,
       tool,
+      interactive,
       autoTTSResponse,
       variables
     }: generatingMessageProps & { autoTTSResponse?: boolean }) => {
@@ -288,6 +299,16 @@ const ChatBox = (
             };
           } else if (event === SseResponseEventEnum.updateVariables && variables) {
             variablesForm.reset(variables);
+          } else if (event === SseResponseEventEnum.interactive) {
+            const val: AIChatItemValueItemType = {
+              type: ChatItemValueTypeEnum.interactive,
+              interactive
+            };
+
+            return {
+              ...item,
+              value: item.value.concat(val)
+            };
           }
 
           return item;
@@ -318,16 +339,15 @@ const ChatBox = (
 
   // create question guide
   const createQuestionGuide = useCallback(
-    async ({ history }: { history: ChatSiteItemType[] }) => {
+    async ({ histories }: { histories: ChatSiteItemType[] }) => {
       if (!questionGuide || chatController.current?.signal?.aborted) return;
-
       try {
         const abortSignal = new AbortController();
         questionGuideController.current = abortSignal;
 
         const result = await postQuestionGuide(
           {
-            messages: chats2GPTMessages({ messages: history, reserveId: false }).slice(-6),
+            messages: chats2GPTMessages({ messages: histories, reserveId: false }).slice(-6),
             shareId,
             outLinkUid,
             teamId,
@@ -356,47 +376,40 @@ const ChatBox = (
   /**
    * user confirm send prompt
    */
-  const sendPrompt = useCallback(
-    ({
-      text = '',
-      files = [],
-      history = chatHistories,
-      autoTTSResponse = false
-    }: ChatBoxInputType & {
-      autoTTSResponse?: boolean;
-      history?: ChatSiteItemType[];
-    }) => {
+  const sendPrompt: SendPromptFnType = useCallback(
+    ({ text = '', files = [], history = chatHistories, autoTTSResponse = false }) => {
       variablesForm.handleSubmit(
         async (variables) => {
           if (!onStartChat) return;
           if (isChatting) {
             toast({
-              title: '正在聊天中...请等待结束',
+              title: t('chat:is_chatting'),
               status: 'warning'
             });
             return;
           }
 
+          // Abort the previous request
           abortRequest();
+          questionGuideController.current?.abort('stop');
 
           text = text.trim();
 
           if (!text && files.length === 0) {
             toast({
-              title: '内容为空',
+              title: t('chat:content_empty'),
               status: 'warning'
             });
             return;
           }
 
-          // delete invalid variables， 只保留在 variableList 中的变量
+          // Only declared variables are kept
           const requestVariables: Record<string, any> = {};
           allVariableList?.forEach((item) => {
             requestVariables[item.key] = variables[item.key] || '';
           });
 
           const responseChatId = getNanoid(24);
-          questionGuideController.current?.abort('stop');
 
           // set auto audio playing
           if (autoTTSResponse) {
@@ -446,8 +459,9 @@ const ChatBox = (
             }
           ];
 
-          // 插入内容
-          setChatHistories(newChatList);
+          const isInteractive = checkIsInteractiveByHistories(history);
+          // Update histories(Interactive input does not require new session rounds)
+          setChatHistories(isInteractive ? newChatList.slice(0, -2) : newChatList);
 
           // 清空输入内容
           resetInputVal({});
@@ -458,6 +472,7 @@ const ChatBox = (
             const abortSignal = new AbortController();
             chatController.current = abortSignal;
 
+            // Last empty ai message will be removed
             const messages = chats2GPTMessages({ messages: newChatList, reserveId: true });
 
             const {
@@ -465,7 +480,7 @@ const ChatBox = (
               responseText,
               isNewChat = false
             } = await onStartChat({
-              messages: messages.slice(0, -1),
+              messages: messages,
               responseChatItemId: responseChatId,
               controller: abortSignal,
               generatingMessage: (e) => generatingMessage({ ...e, autoTTSResponse }),
@@ -474,35 +489,29 @@ const ChatBox = (
 
             isNewChatReplace.current = isNewChat;
 
-            // set finish status
-            setChatHistories((state) =>
-              state.map((item, index) => {
+            // Set last chat finish status
+            let newChatHistories: ChatSiteItemType[] = [];
+            setChatHistories((state) => {
+              newChatHistories = state.map((item, index) => {
                 if (index !== state.length - 1) return item;
                 return {
                   ...item,
                   status: 'finish',
-                  responseData
+                  responseData: item.responseData
+                    ? [...item.responseData, ...responseData]
+                    : responseData
                 };
-              })
-            );
-            setTimeout(() => {
-              createQuestionGuide({
-                history: newChatList.map((item, i) =>
-                  i === newChatList.length - 1
-                    ? {
-                        ...item,
-                        value: [
-                          {
-                            type: ChatItemValueTypeEnum.text,
-                            text: {
-                              content: responseText
-                            }
-                          }
-                        ]
-                      }
-                    : item
-                )
               });
+              return newChatHistories;
+            });
+
+            setTimeout(() => {
+              if (!checkIsInteractiveByHistories(newChatHistories)) {
+                createQuestionGuide({
+                  histories: newChatHistories
+                });
+              }
+
               generatingScroll();
               isPc && TextareaDom.current?.focus();
             }, 100);
@@ -543,6 +552,7 @@ const ChatBox = (
     },
     [
       abortRequest,
+      allVariableList,
       chatHistories,
       createQuestionGuide,
       finishSegmentedAudio,
@@ -559,7 +569,6 @@ const ChatBox = (
       startSegmentedAudio,
       t,
       toast,
-      variableList,
       variablesForm
     ]
   );
@@ -874,7 +883,6 @@ const ChatBox = (
       });
     }
   }));
-
   return (
     <Flex flexDirection={'column'} h={'100%'} position={'relative'}>
       <Script src="/js/html2pdf.bundle.min.js" strategy="lazyOnload"></Script>
@@ -899,6 +907,7 @@ const ChatBox = (
                     onRetry={retryInput(item.dataId)}
                     onDelete={delOneMessage(item.dataId)}
                     isLastChild={index === chatHistories.length - 1}
+                    onSendMessage={undefined}
                   />
                 )}
                 {item.obj === ChatRoleEnum.AI && (
@@ -908,7 +917,8 @@ const ChatBox = (
                       avatar={appAvatar}
                       chat={item}
                       isLastChild={index === chatHistories.length - 1}
-                      {...(item.obj === ChatRoleEnum.AI && {
+                      onSendMessage={sendPrompt}
+                      {...{
                         showVoiceIcon,
                         shareId,
                         outLinkUid,
@@ -924,11 +934,12 @@ const ChatBox = (
                         onCloseUserLike: onCloseUserLike(item),
                         onAddUserDislike: onAddUserDislike(item),
                         onReadUserDislike: onReadUserDislike(item)
-                      })}
+                      }}
                     >
                       <ResponseTags
-                        flowResponses={item.responseData}
+                        showTags={index !== chatHistories.length - 1 || !isChatting}
                         showDetail={!shareId && !teamId}
+                        historyItem={item}
                       />
 
                       {/* custom feedback */}
@@ -943,7 +954,10 @@ const ChatBox = (
                               <MyTooltip
                                 label={t('common:core.app.feedback.close custom feedback')}
                               >
-                                <Checkbox onChange={onCloseCustomFeedback(item, i)}>
+                                <Checkbox
+                                  onChange={onCloseCustomFeedback(item, i)}
+                                  icon={<MyIcon name={'common/check'} w={'12px'} />}
+                                >
                                   {text}
                                 </Checkbox>
                               </MyTooltip>
@@ -973,13 +987,12 @@ const ChatBox = (
         </Box>
       </Box>
       {/* message input */}
-      {onStartChat && chatStarted && active && appId && (
+      {onStartChat && chatStarted && active && appId && !isInteractive && (
         <ChatInput
           onSendMessage={sendPrompt}
           onStop={() => chatController.current?.abort('stop')}
           TextareaDom={TextareaDom}
           resetInputVal={resetInputVal}
-          showFileSelector={showFileSelector}
           chatForm={chatForm}
           appId={appId}
         />

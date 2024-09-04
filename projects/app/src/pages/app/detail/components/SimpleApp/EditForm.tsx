@@ -28,13 +28,14 @@ import SettingLLMModel from '@/components/core/ai/SettingLLMModel';
 import type { SettingAIDataType } from '@fastgpt/global/core/app/type.d';
 import DeleteIcon, { hoverDeleteStyles } from '@fastgpt/web/components/common/Icon/delete';
 import { TTSTypeEnum } from '@/web/core/app/constants';
-import { getSystemVariables } from '@/web/core/app/utils';
+import { workflowSystemVariables } from '@/web/core/app/utils';
 import { useI18n } from '@/web/context/I18n';
 import { useContextSelector } from 'use-context-selector';
 import { AppContext } from '@/pages/app/detail/components/context';
 import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
 import FormLabel from '@fastgpt/web/components/common/MyBox/FormLabel';
 import VariableTip from '@/components/common/Textarea/MyTextarea/VariableTip';
+import { getWebLLMModel } from '@/web/common/system/utils';
 
 const DatasetSelectModal = dynamic(() => import('@/components/core/app/DatasetSelectModal'));
 const DatasetParamsModal = dynamic(() => import('@/components/core/app/DatasetParamsModal'));
@@ -47,6 +48,7 @@ const ScheduledTriggerConfig = dynamic(
   () => import('@/components/core/app/ScheduledTriggerConfig')
 );
 const WelcomeTextConfig = dynamic(() => import('@/components/core/app/WelcomeTextConfig'));
+const FileSelectConfig = dynamic(() => import('@/components/core/app/FileSelect'));
 
 const BoxStyles: BoxProps = {
   px: [4, 6],
@@ -107,10 +109,11 @@ const EditForm = ({
   const formatVariables = useMemo(
     () =>
       formatEditorVariablePickerIcon([
-        ...getSystemVariables(t),
+        ...workflowSystemVariables,
         ...(appForm.chatConfig.variables || [])
       ]).map((item) => ({
         ...item,
+        label: t(item.label as any),
         parent: {
           id: 'VARIABLE_NODE_ID',
           label: t('common:core.module.Variable'),
@@ -120,11 +123,10 @@ const EditForm = ({
     [appForm.chatConfig.variables, t]
   );
 
+  const selectedModel = getWebLLMModel(appForm.aiSettings.model);
   const tokenLimit = useMemo(() => {
-    return (
-      llmModelList.find((item) => item.model === appForm.aiSettings.model)?.quoteMaxToken || 3000
-    );
-  }, [llmModelList, appForm.aiSettings.model]);
+    return selectedModel?.quoteMaxToken || 3000;
+  }, [selectedModel.quoteMaxToken]);
 
   return (
     <>
@@ -134,13 +136,14 @@ const EditForm = ({
           <Flex alignItems={'center'}>
             <MyIcon name={'core/app/simpleMode/ai'} w={'20px'} />
             <FormLabel ml={2} flex={1}>
-              {appT('ai_settings')}
+              {t('app:ai_settings')}
             </FormLabel>
           </Flex>
           <Flex alignItems={'center'} mt={5}>
             <Box {...LabelStyles}>{t('common:core.ai.Model')}</Box>
             <Box flex={'1 0 0'}>
               <SettingLLMModel
+                bg="myGray.50"
                 llmModelType={'all'}
                 defaultData={{
                   model: appForm.aiSettings.model,
@@ -175,6 +178,7 @@ const EditForm = ({
             <Box mt={1}>
               <PromptEditor
                 value={appForm.aiSettings.systemPrompt}
+                bg={'myGray.50'}
                 onChange={(text) => {
                   startTst(() => {
                     setAppForm((state) => ({
@@ -336,6 +340,23 @@ const EditForm = ({
               </MyTooltip>
             ))}
           </Grid>
+        </Box>
+
+        {/* File select */}
+        <Box {...BoxStyles}>
+          <FileSelectConfig
+            forbidVision={!selectedModel.vision}
+            value={appForm.chatConfig.fileSelectConfig}
+            onChange={(e) => {
+              setAppForm((state) => ({
+                ...state,
+                chatConfig: {
+                  ...state.chatConfig,
+                  fileSelectConfig: e
+                }
+              }));
+            }}
+          />
         </Box>
 
         {/* variable */}

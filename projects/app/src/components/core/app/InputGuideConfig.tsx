@@ -8,8 +8,7 @@ import {
   useDisclosure,
   Switch,
   Textarea,
-  Checkbox,
-  HStack
+  Checkbox
 } from '@chakra-ui/react';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -21,6 +20,7 @@ import { useI18n } from '@/web/context/I18n';
 import { fileDownload } from '@/web/common/file/utils';
 import { getDocPath } from '@/web/common/system/doc';
 import {
+  delAllChatInputGuide,
   delChatInputGuide,
   getChatInputGuideList,
   getCountChatInputGuideTotal,
@@ -38,6 +38,7 @@ import HighlightText from '@fastgpt/web/components/common/String/HighlightText';
 import { defaultChatInputGuideConfig } from '@fastgpt/global/core/app/constants';
 import ChatFunctionTip from './Tip';
 import FormLabel from '@fastgpt/web/components/common/MyBox/FormLabel';
+import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
 
 const csvTemplate = `"第一列内容"
 "只会将第一列内容导入，其余列会被忽略"
@@ -143,6 +144,15 @@ const InputGuideConfig = ({
               <>
                 <Flex mt={8} alignItems={'center'}>
                   <FormLabel>{chatT('custom_input_guide_url')}</FormLabel>
+                  <Flex
+                    onClick={() => window.open(getDocPath('/docs/course/chat_input_guide'))}
+                    color={'primary.700'}
+                    alignItems={'center'}
+                    cursor={'pointer'}
+                  >
+                    <MyIcon name={'book'} w={'17px'} ml={4} mr={1} color={'myGray.600'} />
+                    {commonT('common.Documents')}
+                  </Flex>
                   <Box flex={'1 0 0'} />
                 </Flex>
                 <Textarea
@@ -183,6 +193,10 @@ const LexiconConfigModal = ({ appId, onClose }: { appId: string; onClose: () => 
   const [editDataId, setEditDataId] = useState<string>();
 
   const [searchKey, setSearchKey] = useState('');
+
+  const { openConfirm: openConfirmDel, ConfirmModal: DelConfirmModal } = useConfirm({
+    type: 'delete'
+  });
 
   const {
     list,
@@ -267,6 +281,12 @@ const LexiconConfigModal = ({ appId, onClose }: { appId: string; onClose: () => 
       dataIdList
     });
   };
+  const onDeleteAllData = () => {
+    setData([]);
+    delAllChatInputGuide({
+      appId
+    });
+  };
 
   const onSelectFile = async (files: File[]) => {
     const file = files?.[0];
@@ -339,6 +359,24 @@ const LexiconConfigModal = ({ appId, onClose }: { appId: string; onClose: () => 
               {commonT('common.Delete')}
             </Button>
             <Button
+              variant={'whiteBase'}
+              display={selectedRows.length !== 0 ? 'none' : 'flex'}
+              size={'sm'}
+              leftIcon={<MyIcon name={'delete'} boxSize={4} />}
+              onClick={() =>
+                openConfirmDel(
+                  () => {
+                    onDeleteAllData();
+                    setSelectedRows([]);
+                  },
+                  undefined,
+                  t('chat:delete_all_input_guide_confirm')
+                )()
+              }
+            >
+              {t('chat:Delete_all')}
+            </Button>
+            <Button
               display={selectedRows.length !== 0 ? 'none' : 'flex'}
               onClick={() => {
                 setNewData('');
@@ -396,6 +434,7 @@ const LexiconConfigModal = ({ appId, onClose }: { appId: string; onClose: () => 
               <Checkbox
                 mr={2}
                 isChecked={selected}
+                icon={<MyIcon name={'common/check'} w={'12px'} />}
                 onChange={(e) => {
                   if (e.target.checked) {
                     setSelectedRows([...selectedRows, item._id]);
@@ -468,6 +507,7 @@ const LexiconConfigModal = ({ appId, onClose }: { appId: string; onClose: () => 
         })}
       </ScrollList>
 
+      <DelConfirmModal />
       <File onSelect={onSelectFile} />
     </MyModal>
   );

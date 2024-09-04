@@ -5,22 +5,34 @@ import {
   PopoverContent,
   useDisclosure,
   PlacementWithLogical,
-  PopoverArrow
+  PopoverArrow,
+  PopoverContentProps
 } from '@chakra-ui/react';
+
+interface Props extends PopoverContentProps {
+  Trigger: React.ReactNode;
+  placement?: PlacementWithLogical;
+  offset?: [number, number];
+  trigger?: 'hover' | 'click';
+  hasArrow?: boolean;
+  children: (e: { onClose: () => void }) => React.ReactNode;
+  onCloseFunc?: () => void;
+  onOpenFunc?: () => void;
+  closeOnBlur?: boolean;
+}
 
 const MyPopover = ({
   Trigger,
   placement,
   offset,
   trigger,
-  children
-}: {
-  Trigger: React.ReactNode;
-  placement?: PlacementWithLogical;
-  offset?: [number, number];
-  trigger?: 'hover' | 'click';
-  children: (e: { onClose: () => void }) => React.ReactNode;
-}) => {
+  hasArrow = true,
+  children,
+  onOpenFunc,
+  onCloseFunc,
+  closeOnBlur = false,
+  ...props
+}: Props) => {
   const firstFieldRef = React.useRef(null);
 
   const { onOpen, onClose, isOpen } = useDisclosure();
@@ -29,11 +41,17 @@ const MyPopover = ({
     <Popover
       isOpen={isOpen}
       initialFocusRef={firstFieldRef}
-      onOpen={onOpen}
-      onClose={onClose}
+      onOpen={() => {
+        onOpen();
+        onOpenFunc && onOpenFunc();
+      }}
+      onClose={() => {
+        onClose();
+        onCloseFunc && onCloseFunc();
+      }}
       placement={placement}
       offset={offset}
-      closeOnBlur={false}
+      closeOnBlur={closeOnBlur}
       trigger={trigger}
       openDelay={100}
       closeDelay={100}
@@ -41,8 +59,8 @@ const MyPopover = ({
       lazyBehavior="keepMounted"
     >
       <PopoverTrigger>{Trigger}</PopoverTrigger>
-      <PopoverContent p={4}>
-        <PopoverArrow />
+      <PopoverContent {...props}>
+        {hasArrow && <PopoverArrow />}
         {children({ onClose })}
       </PopoverContent>
     </Popover>

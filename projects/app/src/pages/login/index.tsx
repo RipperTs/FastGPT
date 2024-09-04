@@ -13,6 +13,7 @@ import { clearToken, setToken } from '@/web/support/user/auth';
 import Script from 'next/script';
 import Loading from '@fastgpt/web/components/common/MyLoading';
 import { useMount } from 'ahooks';
+import { t } from 'i18next';
 
 const RegisterForm = dynamic(() => import('./components/RegisterForm'));
 const ForgetPasswordForm = dynamic(() => import('./components/ForgetPasswordForm'));
@@ -117,7 +118,7 @@ const Login = () => {
 
 export async function getServerSideProps(context: any) {
   return {
-    props: { ...(await serviceSideProps(context, ['app'])) }
+    props: { ...(await serviceSideProps(context, ['app', 'user'])) }
   };
 }
 

@@ -12,7 +12,6 @@ import PopoverConfirm from '@fastgpt/web/components/common/MyPopover/PopoverConf
 import { AppSimpleEditFormType } from '@fastgpt/global/core/app/type';
 import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
 import { form2AppWorkflow } from '@/web/core/app/utils';
-import { useSystemStore } from '@/web/common/system/useSystemStore';
 import { TabEnum } from '../context';
 import PublishHistoriesSlider, { type InitProps } from '../PublishHistoriesSlider';
 import { appWorkflow2Form } from '@fastgpt/global/core/app/utils';
@@ -22,6 +21,8 @@ import MyTag from '@fastgpt/web/components/common/Tag/index';
 import { publishStatusStyle } from '../constants';
 import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
+import { useToast } from '@fastgpt/web/hooks/useToast';
+import { formatTime2YMDHMS } from '@fastgpt/global/common/string/time';
 
 const Header = ({
   appForm,
@@ -33,7 +34,8 @@ const Header = ({
   const { t } = useTranslation();
   const { isPc } = useSystem();
   const router = useRouter();
-  const { appId, appDetail, onPublish, currentTab } = useContextSelector(AppContext, (v) => v);
+  const { toast } = useToast();
+  const { appId, appDetail, onSaveApp, currentTab } = useContextSelector(AppContext, (v) => v);
 
   const { data: paths = [] } = useRequest2(() => getAppFolderPath(appId), {
     manual: false,
@@ -52,8 +54,7 @@ const Header = ({
   );
 
   const isPublished = useMemo(() => {
-    const data = form2AppWorkflow(appForm);
-
+    const data = form2AppWorkflow(appForm, t);
     return compareWorkflow(
       {
         nodes: appDetail.modules,
@@ -66,19 +67,25 @@ const Header = ({
         chatConfig: data.chatConfig
       }
     );
-  }, [appDetail.chatConfig, appDetail.modules, appForm]);
+  }, [appDetail.chatConfig, appDetail.modules, appForm, t]);
 
   const onSubmitPublish = useCallback(
     async (data: AppSimpleEditFormType) => {
-      const { nodes, edges } = form2AppWorkflow(data);
-      await onPublish({
+      const { nodes, edges } = form2AppWorkflow(data, t);
+      await onSaveApp({
         nodes,
         edges,
         chatConfig: data.chatConfig,
-        type: AppTypeEnum.simple
+        type: AppTypeEnum.simple,
+        isPublish: true,
+        versionName: formatTime2YMDHMS(new Date())
+      });
+      toast({
+        status: 'success',
+        title: t('app:publish_success')
       });
     },
-    [onPublish]
+    [onSaveApp, t, toast]
   );
 
   const [historiesDefaultData, setHistoriesDefaultData] = useState<InitProps>();
@@ -119,9 +126,11 @@ const Header = ({
                         : publishStatusStyle.unPublish.colorSchema
                     }
                   >
-                    {isPublished
-                      ? publishStatusStyle.published.text
-                      : publishStatusStyle.unPublish.text}
+                    {t(
+                      isPublished
+                        ? publishStatusStyle.published.text
+                        : publishStatusStyle.unPublish.text
+                    )}
                   </MyTag>
                 )}
 
@@ -133,7 +142,7 @@ const Header = ({
                   w={'30px'}
                   variant={'whitePrimary'}
                   onClick={() => {
-                    const { nodes, edges } = form2AppWorkflow(appForm);
+                    const { nodes, edges } = form2AppWorkflow(appForm, t);
                     setHistoriesDefaultData({
                       nodes,
                       edges,

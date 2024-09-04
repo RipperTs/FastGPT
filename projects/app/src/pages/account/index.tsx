@@ -8,7 +8,7 @@ import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
 import PageContainer from '@/components/PageContainer';
 import SideTabs from '@/components/SideTabs';
 import LightRowTabs from '@fastgpt/web/components/common/Tabs/LightRowTabs';
-import UserInfo from './components/Info';
+import UserInfo from './components/Info/index';
 import { serviceSideProps } from '@/web/common/utils/i18n';
 import { useTranslation } from 'next-i18next';
 import Script from 'next/script';
@@ -16,11 +16,10 @@ import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 const Promotion = dynamic(() => import('./components/Promotion'));
 const UsageTable = dynamic(() => import('./components/UsageTable'));
-const BillTable = dynamic(() => import('./components/BillTable'));
+const BillAndInvoice = dynamic(() => import('./components/bill/BillAndInvoice'));
 const InformTable = dynamic(() => import('./components/InformTable'));
 const ApiKeyTable = dynamic(() => import('./components/ApiKeyTable'));
 const Individuation = dynamic(() => import('./components/Individuation'));
-
 enum TabEnum {
   'info' = 'info',
   'promotion' = 'promotion',
@@ -107,6 +106,12 @@ const Account = ({ currentTab }: { currentTab: TabEnum }) => {
                 value={currentTab}
                 onChange={setCurrentTab}
               />
+              <Flex alignItems={'center'}>
+                <Box w={'8px'} h={'8px'} borderRadius={'50%'} bg={'#67c13b'} />
+                <Box fontSize={'md'} ml={2}>
+                  V{systemVersion}
+                </Box>
+              </Flex>
             </Flex>
           ) : (
             <Box mb={3}>
@@ -127,7 +132,7 @@ const Account = ({ currentTab }: { currentTab: TabEnum }) => {
             {currentTab === TabEnum.info && <UserInfo />}
             {currentTab === TabEnum.promotion && <Promotion />}
             {currentTab === TabEnum.usage && <UsageTable />}
-            {currentTab === TabEnum.bill && <BillTable />}
+            {currentTab === TabEnum.bill && <BillAndInvoice />}
             {currentTab === TabEnum.individuation && <Individuation />}
             {currentTab === TabEnum.inform && <InformTable />}
             {currentTab === TabEnum.apikey && <ApiKeyTable />}

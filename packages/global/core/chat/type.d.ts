@@ -15,6 +15,7 @@ import type { AppSchema as AppType } from '@fastgpt/global/core/app/type.d';
 import { DatasetSearchModeEnum } from '../dataset/constants';
 import { DispatchNodeResponseType } from '../workflow/runtime/type.d';
 import { ChatBoxInputType } from '../../../../projects/app/src/components/core/chat/ChatContainer/ChatBox/type';
+import { InteractiveNodeResponseItemType } from '../workflow/template/system/userSelect/type';
 
 export type ChatSchema = {
   _id: string;
@@ -67,11 +68,12 @@ export type SystemChatItemType = {
   value: SystemChatItemValueItemType[];
 };
 export type AIChatItemValueItemType = {
-  type: ChatItemValueTypeEnum.text | ChatItemValueTypeEnum.tool;
+  type: ChatItemValueTypeEnum.text | ChatItemValueTypeEnum.tool | ChatItemValueTypeEnum.interactive;
   text?: {
     content: string;
   };
   tools?: ToolModuleResponseItemType[];
+  interactive?: InteractiveNodeResponseItemType;
 };
 export type AIChatItemType = {
   obj: ChatRoleEnum.AI;
@@ -106,17 +108,26 @@ export type AdminFbkType = {
 };
 
 /* --------- chat item ---------- */
-export type ChatItemType = (UserChatItemType | SystemChatItemType | AIChatItemType) & {
-  dataId?: string;
+export type ResponseTagItemType = {
+  totalRunningTime?: number;
+  totalQuoteList?: SearchDataResponseItemType[];
+  llmModuleAccount?: number;
+  historyPreviewLength?: number;
 };
 
+export type ChatItemType = (UserChatItemType | SystemChatItemType | AIChatItemType) & {
+  dataId?: string;
+} & ResponseTagItemType;
+
+// Frontend type
 export type ChatSiteItemType = (UserChatItemType | SystemChatItemType | AIChatItemType) & {
   dataId: string;
   status: `${ChatStatusEnum}`;
   moduleName?: string;
   ttsBuffer?: Uint8Array;
   responseData?: ChatHistoryItemResType[];
-} & ChatBoxInputType;
+} & ChatBoxInputType &
+  ResponseTagItemType;
 
 /* --------- team chat --------- */
 export type ChatAppListSchema = {
@@ -140,8 +151,16 @@ export type ChatHistoryItemType = HistoryItemType & {
 /* ------- response data ------------ */
 export type ChatHistoryItemResType = DispatchNodeResponseType & {
   nodeId: string;
+  id: string;
   moduleType: FlowNodeTypeEnum;
   moduleName: string;
+};
+
+/* ---------- node outputs ------------ */
+export type NodeOutputItemType = {
+  nodeId: string;
+  key: NodeOutputKeyEnum;
+  value: any;
 };
 
 /* One tool run response  */

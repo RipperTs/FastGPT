@@ -51,6 +51,7 @@ export type DatasetCollectionSchemaType = {
   chunkSize: number;
   chunkSplitter?: string;
   qaPrompt?: string;
+  ocrParse?: boolean;
 
   tags?: string[];
 
@@ -67,6 +68,13 @@ export type DatasetCollectionSchemaType = {
 
     [key: string]: any;
   };
+};
+
+export type DatasetCollectionTagsSchemaType = {
+  _id: string;
+  teamId: string;
+  datasetId: string;
+  tag: string;
 };
 
 export type DatasetDataIndexItemType = {
@@ -130,7 +138,9 @@ export type DatasetSimpleItemType = {
 };
 export type DatasetListItemType = {
   _id: string;
+  tmbId: string;
   avatar: string;
+  updateTime: Date;
   name: string;
   intro: string;
   type: `${DatasetTypeEnum}`;
@@ -142,6 +152,17 @@ export type DatasetItemType = Omit<DatasetSchemaType, 'vectorModel' | 'agentMode
   vectorModel: VectorModelItemType;
   agentModel: LLMModelItemType;
   permission: DatasetPermission;
+};
+
+/* ================= tag ===================== */
+export type DatasetTagType = {
+  _id: string;
+  tag: string;
+};
+
+export type TagUsageType = {
+  tagId: string;
+  collections: string[];
 };
 
 /* ================= collection ===================== */

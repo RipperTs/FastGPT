@@ -93,7 +93,7 @@ const Logs = () => {
         flexDirection={'column'}
         {...cardStyles}
         boxShadow={3.5}
-        mt={4}
+        mt={[0, 4]}
         px={[4, 8]}
         py={[4, 6]}
         flex={'1 0 0'}

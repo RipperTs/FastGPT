@@ -20,6 +20,8 @@ export type PostPublishAppProps = {
   nodes: AppSchema['modules'];
   edges: AppSchema['edges'];
   chatConfig: AppSchema['chatConfig'];
+  isPublish?: boolean;
+  versionName?: string;
 };
 
 export type PostRevertAppProps = {
@@ -28,4 +30,9 @@ export type PostRevertAppProps = {
   editNodes: AppSchema['modules'];
   editEdges: AppSchema['edges'];
   editChatConfig: AppSchema['chatConfig'];
+};
+
+export type AppChangeOwnerBody = {
+  appId: string;
+  ownerId: string;
 };

@@ -174,9 +174,9 @@ function Reference({
     <>
       <Flex alignItems={'center'} mb={1}>
         <FormLabel required={input.required}>{input.label}</FormLabel>
-        {input.description && <QuestionTip label={input.description}></QuestionTip>}
+        {input.description && <QuestionTip ml={0.5} label={input.description}></QuestionTip>}
         {/* value */}
-        <ValueTypeLabel valueType={input.valueType} />
+        <ValueTypeLabel valueType={input.valueType} valueDesc={input.valueDesc} />
 
         <MyIcon
           name={'common/settingLight'}

@@ -9,25 +9,22 @@ import {
   ChatCompletionMessageFunctionCall,
   ChatCompletionFunctionMessageParam,
   ChatCompletionAssistantMessageParam
-} from '@fastgpt/global/core/ai/type';
+} from '@fastgpt/global/core/ai/type.d';
 import { NextApiResponse } from 'next';
-import {
-  responseWrite,
-  responseWriteController,
-  responseWriteNodeStatus
-} from '../../../../../common/response';
+import { responseWriteController } from '../../../../../common/response';
 import { SseResponseEventEnum } from '@fastgpt/global/core/workflow/runtime/constants';
 import { textAdaptGptResponse } from '@fastgpt/global/core/workflow/runtime/utils';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { dispatchWorkFlow } from '../../index';
 import { DispatchToolModuleProps, RunToolResponse, ToolNodeItemType } from './type.d';
 import json5 from 'json5';
-import { DispatchFlowResponse } from '../../type';
+import { DispatchFlowResponse, WorkflowResponseType } from '../../type';
 import { countGptMessagesTokens } from '../../../../../common/string/tiktoken/index';
-import { getNanoid } from '@fastgpt/global/common/string/tools';
+import { getNanoid, sliceStrStartEnd } from '@fastgpt/global/common/string/tools';
 import { AIChatItemType } from '@fastgpt/global/core/chat/type';
 import { GPTMessages2Chats } from '@fastgpt/global/core/chat/adapt';
 import { updateToolInputValue } from './utils';
+import { computedMaxToken, computedTemperature } from '../../../../ai/utils';
 
 type FunctionRunResponseType = {
   toolRunResponse: DispatchFlowResponse;
@@ -42,7 +39,18 @@ export const runToolWithFunctionCall = async (
   },
   response?: RunToolResponse
 ): Promise<RunToolResponse> => {
-  const { toolModel, toolNodes, messages, res, runtimeNodes, detail = false, node, stream } = props;
+  const {
+    toolModel,
+    toolNodes,
+    messages,
+    res,
+    requestOrigin,
+    runtimeNodes,
+    node,
+    stream,
+    workflowStreamResponse,
+    params: { temperature = 0, maxToken = 4000, aiChatVision }
+  } = props;
   const assistantResponses = response?.assistantResponses || [];
 
   const functions: ChatCompletionCreateParams.Function[] = toolNodes.map((item) => {
@@ -72,52 +80,68 @@ export const runToolWithFunctionCall = async (
     };
   });
 
-  const filterMessages = await filterGPTMessageByMaxTokens({
-    messages,
-    maxTokens: toolModel.maxContext - 500 // filter token. not response maxToken
-  });
-  const formativeMessages = filterMessages.map((item) => {
+  const filterMessages = (
+    await filterGPTMessageByMaxTokens({
+      messages,
+      maxTokens: toolModel.maxContext - 300 // filter token. not response maxToken
+    })
+  ).map((item) => {
     if (item.role === ChatCompletionRequestMessageRoleEnum.Assistant && item.function_call) {
       return {
         ...item,
         function_call: {
           name: item.function_call?.name,
           arguments: item.function_call?.arguments
-        }
+        },
+        content: ''
       };
     }
     return item;
   });
-  const requestMessages = await loadRequestMessages(formativeMessages);
+  const [requestMessages, max_tokens] = await Promise.all([
+    loadRequestMessages({
+      messages: filterMessages,
+      useVision: toolModel.vision && aiChatVision,
+      origin: requestOrigin
+    }),
+    computedMaxToken({
+      model: toolModel,
+      maxToken,
+      filterMessages
+    })
+  ]);
+  const requestBody: any = {
+    ...toolModel?.defaultConfig,
+    model: toolModel.model,
+    temperature: computedTemperature({
+      model: toolModel,
+      temperature
+    }),
+    max_tokens,
+    stream,
+    messages: requestMessages,
+    functions,
+    function_call: 'auto'
+  };
 
+  // console.log(JSON.stringify(requestBody, null, 2));
   /* Run llm */
   const ai = getAIApi({
     timeout: 480000
   });
-  const aiResponse = await ai.chat.completions.create(
-    {
-      ...toolModel?.defaultConfig,
-      model: toolModel.model,
-      temperature: 0,
-      stream,
-      messages: requestMessages,
-      functions,
-      function_call: 'auto'
-    },
-    {
-      headers: {
-        Accept: 'application/json, text/plain, */*'
-      }
+  const aiResponse = await ai.chat.completions.create(requestBody, {
+    headers: {
+      Accept: 'application/json, text/plain, */*'
     }
-  );
+  });
 
   const { answer, functionCalls } = await (async () => {
     if (res && stream) {
       return streamResponse({
         res,
-        detail,
         toolNodes,
-        stream: aiResponse
+        stream: aiResponse,
+        workflowStreamResponse
       });
     } else {
       const result = aiResponse as ChatCompletion;
@@ -188,21 +212,18 @@ export const runToolWithFunctionCall = async (
           content: stringToolResponse
         };
 
-        if (stream && detail) {
-          responseWrite({
-            res,
-            event: SseResponseEventEnum.toolResponse,
-            data: JSON.stringify({
-              tool: {
-                id: tool.id,
-                toolName: '',
-                toolAvatar: '',
-                params: '',
-                response: stringToolResponse
-              }
-            })
-          });
-        }
+        workflowStreamResponse?.({
+          event: SseResponseEventEnum.toolResponse,
+          data: {
+            tool: {
+              id: tool.id,
+              toolName: '',
+              toolAvatar: '',
+              params: '',
+              response: sliceStrStartEnd(stringToolResponse, 500, 500)
+            }
+          }
+        });
 
         return {
           toolRunResponse,
@@ -222,7 +243,7 @@ export const runToolWithFunctionCall = async (
       function_call: functionCall
     };
     const concatToolMessages = [
-      ...filterMessages,
+      ...requestMessages,
       assistantToolMsgParams
     ] as ChatCompletionMessageParam[];
     const tokens = await countGptMessagesTokens(concatToolMessages, undefined, functions);
@@ -232,10 +253,14 @@ export const runToolWithFunctionCall = async (
     ];
     // console.log(tokens, 'tool');
 
-    if (stream && detail) {
-      responseWriteNodeStatus({
-        res,
-        name: node.name
+    // Run tool status
+    if (node.showStatus) {
+      workflowStreamResponse?.({
+        event: SseResponseEventEnum.flowNodeStatus,
+        data: {
+          status: 'running',
+          name: node.name
+        }
       });
     }
 
@@ -309,14 +334,14 @@ export const runToolWithFunctionCall = async (
 
 async function streamResponse({
   res,
-  detail,
   toolNodes,
-  stream
+  stream,
+  workflowStreamResponse
 }: {
   res: NextApiResponse;
-  detail: boolean;
   toolNodes: ToolNodeItemType[];
   stream: StreamChatType;
+  workflowStreamResponse?: WorkflowResponseType;
 }) {
   const write = responseWriteController({
     res,
@@ -339,9 +364,9 @@ async function streamResponse({
       const content = responseChoice?.content || '';
       textAnswer += content;
 
-      responseWrite({
+      workflowStreamResponse?.({
         write,
-        event: detail ? SseResponseEventEnum.answer : undefined,
+        event: SseResponseEventEnum.answer,
         data: textAdaptGptResponse({
           text: content
         })
@@ -369,22 +394,20 @@ async function streamResponse({
             toolAvatar: toolNode.avatar
           });
 
-          if (detail) {
-            responseWrite({
-              write,
-              event: SseResponseEventEnum.toolCall,
-              data: JSON.stringify({
-                tool: {
-                  id: functionId,
-                  toolName: toolNode.name,
-                  toolAvatar: toolNode.avatar,
-                  functionName: functionCall.name,
-                  params: functionCall.arguments,
-                  response: ''
-                }
-              })
-            });
-          }
+          workflowStreamResponse?.({
+            write,
+            event: SseResponseEventEnum.toolCall,
+            data: {
+              tool: {
+                id: functionId,
+                toolName: toolNode.name,
+                toolAvatar: toolNode.avatar,
+                functionName: functionCall.name,
+                params: functionCall.arguments,
+                response: ''
+              }
+            }
+          });
         }
 
         continue;
@@ -396,21 +419,19 @@ async function streamResponse({
       if (currentTool) {
         currentTool.arguments += arg;
 
-        if (detail) {
-          responseWrite({
-            write,
-            event: SseResponseEventEnum.toolParams,
-            data: JSON.stringify({
-              tool: {
-                id: functionId,
-                toolName: '',
-                toolAvatar: '',
-                params: arg,
-                response: ''
-              }
-            })
-          });
-        }
+        workflowStreamResponse?.({
+          write,
+          event: SseResponseEventEnum.toolParams,
+          data: {
+            tool: {
+              id: functionId,
+              toolName: '',
+              toolAvatar: '',
+              params: arg,
+              response: ''
+            }
+          }
+        });
       }
     }
   }

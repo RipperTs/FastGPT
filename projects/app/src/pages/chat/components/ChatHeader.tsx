@@ -49,42 +49,42 @@ const ChatHeader = ({
   apps?: AppListItemType[];
   onRouteToAppDetail?: () => void;
 }) => {
+  const { t } = useTranslation();
   const isPlugin = chatData.app.type === AppTypeEnum.plugin;
   const { isPc } = useSystem();
 
-  return (
-    <>
-      {isPc && isPlugin ? null : (
-        <Flex
-          alignItems={'center'}
-          px={[3, 5]}
-          minH={['46px', '60px']}
-          borderBottom={'sm'}
-          color={'myGray.900'}
-          fontSize={'sm'}
-        >
-          {isPc ? (
-            <PcHeader
-              alternativeModelList={alternativeModelList}
-              title={chatData.title}
-              chatModels={chatData.app.chatModels}
-              history={history}
-            />
-          ) : (
-            <MobileHeader
-              apps={apps}
-              appId={chatData.appId}
-              name={chatData.app.name}
-              avatar={chatData.app.avatar}
-              showHistory={showHistory}
-            />
-          )}
-
-          {/* control */}
-          {!isPlugin && <ToolMenu history={history} />}
-        </Flex>
+  return isPc && isPlugin ? null : (
+    <Flex
+      alignItems={'center'}
+      px={[3, 5]}
+      minH={['46px', '60px']}
+      borderBottom={'sm'}
+      color={'myGray.900'}
+      fontSize={'sm'}
+    >
+      {isPc ? (
+        <>
+          <PcHeader
+            alternativeModelList={alternativeModelList}
+            title={chatData.title || t('common:core.chat.New Chat')}
+            chatModels={chatData.app.chatModels}
+            history={history}
+          />
+          <Box flex={1} />
+        </>
+      ) : (
+        <MobileHeader
+          apps={apps}
+          appId={chatData.appId}
+          name={chatData.app.name}
+          avatar={chatData.app.avatar}
+          showHistory={showHistory}
+        />
       )}
-    </>
+
+      {/* control */}
+      {!isPlugin && <ToolMenu history={history} onRouteToAppDetail={onRouteToAppDetail} />}
+    </Flex>
   );
 };
 
@@ -324,7 +324,7 @@ const MobileHeader = ({
   );
 };
 
-const PcHeader = ({
+export const PcHeader = ({
   alternativeModelList,
   title,
   chatModels,
@@ -355,7 +355,7 @@ const PcHeader = ({
 
   return (
     <>
-      <Box mr={3} maxW={'160px'} className="textEllipsis" color={'myGray.1000'}>
+      <Box mr={3} maxW={'200px'} className="textEllipsis" color={'myGray.1000'}>
         {title}
       </Box>
       <MyTag>

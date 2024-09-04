@@ -34,6 +34,7 @@ const Button = defineStyleConfig({
       transform: 'scale(0.98)'
     },
     _disabled: {
+      transform: 'none !important',
       _hover: {
         filter: 'none'
       }
@@ -181,28 +182,6 @@ const Button = defineStyleConfig({
       bg: 'white',
       transition: 'background 0.1s',
       boxShadow: '0px 0px 1px 0px rgba(19, 51, 107, 0.08), 0px 1px 2px 0px rgba(19, 51, 107, 0.05)',
-      _hover: {
-        color: 'primary.600',
-        background: 'primary.1',
-        borderColor: 'primary.300'
-      },
-      _active: {
-        color: 'primary.600'
-      },
-      _disabled: {
-        color: 'myGray.600 !important'
-      }
-    },
-    whiteFlow: {
-      color: 'myGray.600',
-      border: '1px solid',
-      borderColor: 'myGray.200',
-      height: '40px',
-      bg: 'white',
-      px: '12px',
-      py: '0',
-      borderRadius: '6px',
-      transition: 'background 0.1s',
       _hover: {
         color: 'primary.600',
         background: 'primary.1',
@@ -476,6 +455,7 @@ const Checkbox = checkBoxMultiStyle({
       _checked: {
         bg: 'primary.50',
         borderColor: 'primary.600',
+        borderWidth: '1px',
         color: 'primary.600',
         boxShadow: `${shadowLight} !important`,
         _hover: {
@@ -490,15 +470,29 @@ const Checkbox = checkBoxMultiStyle({
 });
 
 const Modal = modalMultiStyle({
-  baseStyle: modalPart({
-    body: {
-      py: 4,
-      px: 7
-    },
-    footer: {
-      pt: 2
-    }
-  })
+  sizes: {
+    md: modalPart({
+      body: {
+        py: 4,
+        px: 7
+      },
+      footer: {
+        pt: 2
+      }
+    }),
+    lg: modalPart({
+      body: {
+        pt: 8,
+        pb: 6,
+        px: '3.25rem'
+      },
+      footer: {
+        pb: 8,
+        px: '3.25rem',
+        pt: 0
+      }
+    })
+  }
 });
 
 const Table = tableMultiStyle({
@@ -677,6 +671,19 @@ export const theme = extendTheme({
       700: '#B54708',
       800: '#93370D',
       900: '#7A2E0E'
+    },
+    adora: {
+      25: '#FCFCFF',
+      50: '#F0EEFF',
+      100: '#E4E1FC',
+      200: '#D3CAFF',
+      300: '#B6A8FC',
+      400: '#9E8DFB',
+      500: '#8774EE',
+      600: '#6F5DD7',
+      700: '#5E4EBD',
+      800: '#4E4198',
+      900: '#42387D'
     },
     borderColor: {
       low: '#E8EBF0',

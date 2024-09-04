@@ -17,7 +17,9 @@ export const chatConfigType = {
   ttsConfig: Object,
   whisperConfig: Object,
   scheduledTriggerConfig: Object,
-  chatInputGuide: Object
+  chatInputGuide: Object,
+  fileSelectConfig: Object,
+  instruction: String
 };
 
 // schema

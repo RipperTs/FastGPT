@@ -18,7 +18,9 @@ export type TeamSchema = {
   };
   lafAccount: LafAccountType;
   defaultPermission: PermissionValueType;
+  notificationAccount?: string;
 };
+
 export type tagsType = {
   label: string;
   key: string;
@@ -63,6 +65,7 @@ export type TeamTmbItemType = {
   role: `${TeamMemberRoleEnum}`;
   status: `${TeamMemberStatusEnum}`;
   lafAccount?: LafAccountType;
+  notificationAccount?: string;
   permission: TeamPermission;
 };
 
@@ -72,7 +75,6 @@ export type TeamMemberItemType = {
   teamId: string;
   memberName: string;
   avatar: string;
-  // TODO: this should be deprecated.
   role: `${TeamMemberRoleEnum}`;
   status: `${TeamMemberStatusEnum}`;
   permission: TeamPermission;
@@ -87,4 +89,20 @@ export type LafAccountType = {
   token: string;
   appid: string;
   pat: string;
+};
+
+export type TeamInvoiceHeaderType = {
+  teamName: string;
+  unifiedCreditCode: string;
+  companyAddress?: string;
+  companyPhone?: string;
+  bankName?: string;
+  bankAccount?: string;
+  needSpecialInvoice: boolean;
+  emailAddress: string;
+};
+
+export type TeamInvoiceHeaderInfoSchemaType = TeamInvoiceHeaderType & {
+  _id: string;
+  teamId: string;
 };

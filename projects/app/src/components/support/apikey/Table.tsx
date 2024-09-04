@@ -25,7 +25,6 @@ import {
 } from '@/web/support/openapi/api';
 import type { EditApiKeyProps } from '@/global/support/openapi/api.d';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { useLoading } from '@fastgpt/web/hooks/useLoading';
 import dayjs from 'dayjs';
 import { AddIcon } from '@chakra-ui/icons';
 import { useCopyData } from '@/web/common/hooks/useCopyData';
@@ -53,16 +52,16 @@ const defaultEditData: EditProps = {
 
 const ApiKeyTable = ({ tips, appId }: { tips: string; appId?: string }) => {
   const { t } = useTranslation();
-  const { Loading } = useLoading();
   const theme = useTheme();
   const { copyData } = useCopyData();
   const { feConfigs } = useSystemStore();
   const [baseUrl, setBaseUrl] = useState('https://fastgpt.in/api');
   const [editData, setEditData] = useState<EditProps>();
   const [apiKey, setApiKey] = useState('');
+
   const { ConfirmModal, openConfirm } = useConfirm({
     type: 'delete',
-    content: '确认删除该API密钥？删除后该密钥立即失效，对应的对话日志不会删除，请确认！'
+    content: t('workflow:delete_api')
   });
 
   const { mutate: onclickRemove, isLoading: isDeleting } = useMutation({
@@ -82,7 +81,7 @@ const ApiKeyTable = ({ tips, appId }: { tips: string; appId?: string }) => {
 
   useEffect(() => {
     setBaseUrl(feConfigs?.customApiDomain || `${location.origin}/api`);
-  }, []);
+  }, [feConfigs?.customApiDomain]);
 
   return (
     <MyBox
@@ -256,6 +255,7 @@ const ApiKeyTable = ({ tips, appId }: { tips: string; appId?: string }) => {
             wordBreak={'break-all'}
             cursor={'pointer'}
             borderRadius={'md'}
+            userSelect={'all'}
             onClick={() => copyData(apiKey)}
           >
             <Box flex={1}>{apiKey}</Box>
@@ -301,7 +301,7 @@ function EditKeyModal({
 
   const { mutate: onclickCreate, isLoading: creating } = useRequest({
     mutationFn: async (e: EditProps) => createAOpenApiKey(e),
-    errorToast: '创建链接异常',
+    errorToast: t('workflow:create_link_error'),
     onSuccess: onCreate
   });
   const { mutate: onclickUpdate, isLoading: updating } = useRequest({
@@ -309,7 +309,7 @@ function EditKeyModal({
       //@ts-ignore
       return putOpenApiKey(e);
     },
-    errorToast: '更新链接异常',
+    errorToast: t('workflow:update_link_error'),
     onSuccess: onEdit
   });
 

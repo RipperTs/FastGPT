@@ -19,10 +19,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getPromotionInitData, getPromotionRecords } from '@/web/support/activity/promotion/api';
 import { useUserStore } from '@/web/support/user/useUserStore';
 
-import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
 import { useCopyData } from '@/web/common/hooks/useCopyData';
 import type { PromotionRecordType } from '@/global/support/api/userRes.d';
-import MyIcon from '@fastgpt/web/components/common/Icon';
 import dayjs from 'dayjs';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { useLoading } from '@fastgpt/web/hooks/useLoading';
@@ -105,9 +103,9 @@ const Promotion = () => {
           <Table>
             <Thead>
               <Tr>
-                <Th>时间</Th>
-                <Th>类型</Th>
-                <Th>金额(￥)</Th>
+                <Th>{t('common:user.Time')}</Th>
+                <Th>{t('common:user.type')}</Th>
+                <Th>{t('common:pay.amount')}</Th>
               </Tr>
             </Thead>
             <Tbody fontSize={'sm'}>
@@ -116,7 +114,7 @@ const Promotion = () => {
                   <Td>
                     {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
                   </Td>
-                  <Td>{t(`user.promotion.${item.type}` as any)}</Td>
+                  <Td>{t(`user:promotion.${item.type}` as any)}</Td>
                   <Td>{item.amount}</Td>
                 </Tr>
               ))}
@@ -124,7 +122,9 @@ const Promotion = () => {
           </Table>
         </TableContainer>
 
-        {!isLoading && promotionRecords.length === 0 && <EmptyTip text="无邀请记录~"></EmptyTip>}
+        {!isLoading && promotionRecords.length === 0 && (
+          <EmptyTip text={t('common:user.no_invite_records')}></EmptyTip>
+        )}
         {total > pageSize && (
           <Flex mt={4} justifyContent={'flex-end'}>
             <Pagination />

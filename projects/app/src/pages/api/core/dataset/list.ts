@@ -36,6 +36,7 @@ async function handler(req: ApiRequestProps<GetDatasetListBody>) {
       return await authDataset({
         req,
         authToken: true,
+        authApiKey: true,
         per: ReadPermissionVal,
         datasetId: parentId
       });
@@ -127,7 +128,9 @@ async function handler(req: ApiRequestProps<GetDatasetListBody>) {
       permission: item.permission,
       vectorModel: getVectorModel(item.vectorModel),
       defaultPermission: item.defaultPermission ?? DatasetDefaultPermissionVal,
-      inheritPermission: item.inheritPermission
+      inheritPermission: item.inheritPermission,
+      tmbId: item.tmbId,
+      updateTime: item.updateTime
     }))
   );
 

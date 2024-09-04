@@ -20,6 +20,7 @@ import { getDocPath } from '@/web/common/system/doc';
 import AIModelSelector from '@/components/Select/AIModelSelector';
 import { LLMModelItemType } from '@fastgpt/global/core/ai/model.d';
 import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
+import { getWebLLMModel } from '@/web/common/system/utils';
 
 const AIChatSettingsModal = ({
   onClose,
@@ -41,18 +42,21 @@ const AIChatSettingsModal = ({
   });
   const model = watch('model');
   const showResponseAnswerText = watch(NodeInputKeyEnum.aiChatIsResponseText) !== undefined;
+  const showVisionSwitch = watch(NodeInputKeyEnum.aiChatVision) !== undefined;
   const showMaxHistoriesSlider = watch('maxHistories') !== undefined;
-  const selectedModel = llmModelList.find((item) => item.model === model) || llmModelList[0];
+  const useVision = watch('aiChatVision');
+  const selectedModel = getWebLLMModel(model);
+  const llmSupportVision = !!selectedModel?.vision;
 
   const tokenLimit = useMemo(() => {
-    return llmModelList.find((item) => item.model === model)?.maxResponse || 4096;
-  }, [llmModelList, model]);
+    return selectedModel?.maxResponse || 4096;
+  }, [selectedModel?.maxResponse]);
 
   const onChangeModel = (e: string) => {
     setValue('model', e);
 
     // update max tokens
-    const modelData = llmModelList.find((item) => item.model === e);
+    const modelData = getWebLLMModel(e);
     if (modelData) {
       setValue('maxToken', modelData.maxResponse / 2);
     }
@@ -65,7 +69,7 @@ const AIChatSettingsModal = ({
     alignItems: 'center',
     fontSize: 'sm',
     color: 'myGray.900',
-    width: ['80px', '90px']
+    width: ['6rem', '8rem']
   };
 
   return (
@@ -97,24 +101,24 @@ const AIChatSettingsModal = ({
           <Box {...LabelStyles} mr={2}>
             {t('common:core.ai.Max context')}
           </Box>
-          <Box flex={1} ml={'10px'}>
-            {selectedModel?.maxContext || 4096}Tokens
-          </Box>
+          <Box flex={1}>{selectedModel?.maxContext || 4096}Tokens</Box>
         </Flex>
-        <Flex mt={8}>
+        <Flex mt={6}>
           <Box {...LabelStyles} mr={2}>
             {t('common:core.ai.Support tool')}
             <QuestionTip ml={1} label={t('common:core.module.template.AI support tool tip')} />
           </Box>
-          <Box flex={1} ml={'10px'}>
-            {selectedModel?.toolChoice || selectedModel?.functionCall ? '支持' : '不支持'}
+          <Box flex={1}>
+            {selectedModel?.toolChoice || selectedModel?.functionCall
+              ? t('common:common.support')
+              : t('common:common.not_support')}
           </Box>
         </Flex>
-        <Flex mt={8}>
+        <Flex mt={6}>
           <Box {...LabelStyles} mr={2}>
             {t('common:core.app.Temperature')}
           </Box>
-          <Box flex={1} ml={'10px'}>
+          <Box flex={1} ml={1}>
             <MySlider
               markList={[
                 { label: t('common:core.app.deterministic'), value: 0 },
@@ -131,11 +135,11 @@ const AIChatSettingsModal = ({
             />
           </Box>
         </Flex>
-        <Flex mt={8}>
+        <Flex mt={6}>
           <Box {...LabelStyles} mr={2}>
             {t('common:core.app.Max tokens')}
           </Box>
-          <Box flex={1} ml={'10px'}>
+          <Box flex={1}>
             <MySlider
               markList={[
                 { label: '100', value: 100 },
@@ -154,11 +158,11 @@ const AIChatSettingsModal = ({
           </Box>
         </Flex>
         {showMaxHistoriesSlider && (
-          <Flex mt={8}>
+          <Flex mt={6}>
             <Box {...LabelStyles} mr={2}>
               {t('common:core.app.Max histories')}
             </Box>
-            <Box flex={1} ml={'10px'}>
+            <Box flex={1}>
               <MySlider
                 markList={[
                   { label: 0, value: 0 },
@@ -177,7 +181,7 @@ const AIChatSettingsModal = ({
           </Flex>
         )}
         {showResponseAnswerText && (
-          <Flex mt={8} alignItems={'center'}>
+          <Flex mt={6} alignItems={'center'}>
             <Box {...LabelStyles}>
               {t('common:core.app.Ai response')}
               <QuestionTip
@@ -185,7 +189,7 @@ const AIChatSettingsModal = ({
                 label={t('common:core.module.template.AI response switch tip')}
               ></QuestionTip>
             </Box>
-            <Box flex={1} ml={'10px'}>
+            <Box flex={1}>
               <Switch
                 isChecked={getValues(NodeInputKeyEnum.aiChatIsResponseText)}
                 onChange={(e) => {
@@ -194,6 +198,29 @@ const AIChatSettingsModal = ({
                   setRefresh((state) => !state);
                 }}
               />
+            </Box>
+          </Flex>
+        )}
+        {showVisionSwitch && (
+          <Flex mt={6} alignItems={'center'}>
+            <Box {...LabelStyles}>
+              {t('app:llm_use_vision')}
+              <QuestionTip ml={1} label={t('app:llm_use_vision_tip')}></QuestionTip>
+            </Box>
+            <Box flex={1}>
+              {llmSupportVision ? (
+                <Switch
+                  isChecked={useVision}
+                  onChange={(e) => {
+                    const value = e.target.checked;
+                    setValue(NodeInputKeyEnum.aiChatVision, value);
+                  }}
+                />
+              ) : (
+                <Box fontSize={'sm'} color={'myGray.500'}>
+                  {t('app:llm_not_support_vision')}
+                </Box>
+              )}
             </Box>
           </Flex>
         )}

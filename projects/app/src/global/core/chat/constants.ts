@@ -12,7 +12,7 @@ export const defaultChatData: InitChatResponse = {
     type: AppTypeEnum.simple,
     pluginInputs: []
   },
-  title: '新对话',
+  title: '',
   variables: {},
   history: []
 };

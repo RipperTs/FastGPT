@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 
 import InputLabel from './Label';
 import type { RenderInputProps } from './type';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
 
 const RenderList: {
   types: FlowNodeInputTypeEnum[];
@@ -18,6 +19,10 @@ const RenderList: {
   {
     types: [FlowNodeInputTypeEnum.input],
     Component: dynamic(() => import('./templates/TextInput'))
+  },
+  {
+    types: [FlowNodeInputTypeEnum.select],
+    Component: dynamic(() => import('./templates/Select'))
   },
   {
     types: [FlowNodeInputTypeEnum.numberInput],
@@ -74,7 +79,18 @@ type Props = {
   mb?: number;
 };
 const RenderInput = ({ flowInputList, nodeId, CustomComponent, mb = 5 }: Props) => {
-  const copyInputs = useMemo(() => JSON.stringify(flowInputList), [flowInputList]);
+  const { feConfigs } = useSystemStore();
+
+  const copyInputs = useMemo(
+    () =>
+      JSON.stringify(
+        flowInputList.filter((input) => {
+          if (input.isPro && !feConfigs?.isPlus) return false;
+          return true;
+        })
+      ),
+    [feConfigs?.isPlus, flowInputList]
+  );
   const filterInputs = useMemo(() => {
     return JSON.parse(copyInputs) as FlowNodeInputItemType[];
   }, [copyInputs]);
