@@ -99,7 +99,9 @@ export default staticContent;
 
 ```sh
 # Docker cmd: Build image, not proxy
-docker build -f ./projects/app/Dockerfile -t registry.cn-hangzhou.aliyuncs.com/fastgpt/fastgpt:v4.8.1 . --build-arg name=app
+docker build -f ./projects/app/Dockerfile -t registry.cn-hangzhou.aliyuncs.com/ripper/easygpts:latest .
+# Build amd64 image
+docker build --platform linux/amd64 -f ./projects/app/Dockerfile -t registry.cn-hangzhou.aliyuncs.com/ripper/easygpts:latest .
 # Make cmd: Build image, not proxy
 make build name=app image=registry.cn-hangzhou.aliyuncs.com/fastgpt/fastgpt:v4.8.1
 
