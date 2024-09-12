@@ -42,12 +42,12 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
           })
         );
         toast({
-          title: t('user:login.success'),
+          title: t('login:login_success'),
           status: 'success'
         });
       } catch (error: any) {
         toast({
-          title: error.message || t('user:login.error'),
+          title: error.message || t('login:login_failed'),
           status: 'error'
         });
       }
@@ -60,7 +60,7 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
 
   const placeholder = (() => {
     if (isCommunityVersion) {
-      return t('common:support.user.login.Root login');
+      return t('login:use_root_login');
     }
     return [t('common:support.user.login.Username')]
       .concat(
@@ -101,14 +101,14 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
             type={'password'}
             placeholder={
               isCommunityVersion
-                ? t('common:support.user.login.Root password placeholder')
+                ? t('login:root_password_placeholder')
                 : t('common:support.user.login.Password')
             }
             {...register('password', {
               required: true,
               maxLength: {
                 value: 60,
-                message: t('user:login.password_condition')
+                message: t('login:password_condition')
               }
             })}
           ></Input>
@@ -123,7 +123,7 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
           isLoading={requesting}
           onClick={handleSubmit(onclickLogin)}
         >
-          {t('common:Login')}
+          {t('login:Login')}
         </Button>
 
         <Flex align={'center'} justifyContent={'flex-end'} color={'primary.700'}>
@@ -134,7 +134,7 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
               onClick={() => setPageType('forgetPassword')}
               fontSize="sm"
             >
-              {t('common:support.user.login.Forget Password')}
+              {t('login:forget_password')}
             </Box>
           )}
           {feConfigs?.register_method && feConfigs.register_method.length > 0 && (
@@ -146,7 +146,7 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
                 onClick={() => setPageType('register')}
                 fontSize="sm"
               >
-                {t('common:support.user.login.Register')}
+                {t('login:register')}
               </Box>
             </>
           )}

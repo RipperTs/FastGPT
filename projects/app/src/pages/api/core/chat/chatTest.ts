@@ -27,6 +27,7 @@ import {
 import { StoreNodeItemType } from '@fastgpt/global/core/workflow/type/node';
 import { getWorkflowResponseWrite } from '@fastgpt/service/core/workflow/dispatch/utils';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
+import { WORKFLOW_MAX_RUN_TIMES } from '@fastgpt/service/core/workflow/constants';
 
 export type Props = {
   messages: ChatCompletionMessageParam[];
@@ -57,11 +58,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     chatConfig
   } = req.body as Props;
   try {
+    if (!Array.isArray(nodes)) {
+      throw new Error('Nodes is not array');
+    }
+    if (!Array.isArray(edges)) {
+      throw new Error('Edges is not array');
+    }
     const chatMessages = GPTMessages2Chats(messages);
+    const userInput = chatMessages.pop()?.value as UserChatItemValueItemType[] | undefined;
 
     // console.log(JSON.stringify(chatMessages, null, 2), '====', chatMessages.length);
-
-    const userInput = chatMessages.pop()?.value as UserChatItemValueItemType[] | undefined;
 
     /* user auth */
     const [{ app }, { teamId, tmbId }] = await Promise.all([
@@ -75,13 +81,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { user } = await getUserChatInfoAndAuthTeamPoints(tmbId);
 
     const isPlugin = app.type === AppTypeEnum.plugin;
-
-    if (!Array.isArray(nodes)) {
-      throw new Error('Nodes is not array');
-    }
-    if (!Array.isArray(edges)) {
-      throw new Error('Edges is not array');
-    }
 
     let runtimeNodes = storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes, chatMessages));
 
@@ -122,7 +121,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       chatConfig,
       histories: chatMessages,
       stream: true,
-      maxRunTimes: 200,
+      maxRunTimes: WORKFLOW_MAX_RUN_TIMES,
       workflowStreamResponse: workflowResponseWrite
     });
 

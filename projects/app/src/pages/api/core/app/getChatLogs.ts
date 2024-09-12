@@ -13,7 +13,7 @@ import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 
 async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  _res: NextApiResponse
 ): Promise<PagingData<AppLogsListItemType>> {
   const {
     pageNum = 1,
@@ -133,7 +133,8 @@ async function handler(
             customFeedbacksCount: 1,
             markCount: 1,
             outLinkUid: 1,
-            chatId: 1
+            chatId: 1,
+            tmbId: 1
           }
         }
       ],

@@ -199,7 +199,7 @@ const LexiconConfigModal = ({ appId, onClose }: { appId: string; onClose: () => 
   });
 
   const {
-    list,
+    scrollDataList,
     setData,
     ScrollList,
     isLoading: isRequesting,
@@ -207,7 +207,7 @@ const LexiconConfigModal = ({ appId, onClose }: { appId: string; onClose: () => 
     scroll2Top
   } = useScrollPagination(getChatInputGuideList, {
     refreshDeps: [searchKey],
-    debounceWait: 300,
+    // debounceWait: 300,
 
     itemHeight: 48,
     overscan: 20,
@@ -390,7 +390,7 @@ const LexiconConfigModal = ({ appId, onClose }: { appId: string; onClose: () => 
         </Flex>
         {/* new data input */}
         {newData !== undefined && (
-          <Box mt={5} ml={list.length > 0 ? 7 : 0}>
+          <Box mt={5} ml={scrollDataList.length > 0 ? 7 : 0}>
             <MyInput
               autoFocus
               rightIcon={<MyIcon name={'save'} w={'14px'} cursor={'pointer'} />}
@@ -413,7 +413,7 @@ const LexiconConfigModal = ({ appId, onClose }: { appId: string; onClose: () => 
         fontSize={'sm'}
         EmptyChildren={<EmptyTip text={chatT('chat_input_guide_lexicon_is_empty')} />}
       >
-        {list.map((data, index) => {
+        {scrollDataList.map((data, index) => {
           const item = data.data;
 
           const selected = selectedRows.includes(item._id);

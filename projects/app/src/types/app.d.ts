@@ -46,4 +46,5 @@ export type AppLogsListItemType = {
   markCount: number;
   outLinkUid: string | null;
   chatId: string | null;
+  tmbId: string;
 };

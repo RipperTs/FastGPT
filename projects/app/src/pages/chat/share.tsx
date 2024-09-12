@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Box, Flex, Drawer, DrawerOverlay, DrawerContent } from '@chakra-ui/react';
 import { streamFetch } from '@/web/common/api/fetch';
@@ -6,6 +6,8 @@ import { useShareChatStore } from '@/web/core/chat/storeShareChat';
 import SideBar from '@/components/SideBar';
 import { GPTMessages2Chats } from '@fastgpt/global/core/chat/adapt';
 import { customAlphabet } from 'nanoid';
+const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 12);
+
 import ChatBox from '@/components/core/chat/ChatContainer/ChatBox';
 import type { StartChatFnProps } from '@/components/core/chat/ChatContainer/type';
 
@@ -91,6 +93,7 @@ const OutLink = ({
   const outLinkUid: string = authToken || cardNo || localUId;
 
   const {
+    onUpdateHistoryTitle,
     loadHistories,
     onUpdateHistory,
     onClearHistories,
@@ -156,7 +159,7 @@ const OutLink = ({
       if (completionChatId !== chatId) {
         onChangeChatId(completionChatId, true);
       }
-      loadHistories();
+      onUpdateHistoryTitle({ chatId: completionChatId, newTitle });
 
       // update chat window
       setChatData((state) => ({
@@ -184,9 +187,9 @@ const OutLink = ({
       shareId,
       chatData.app.type,
       outLinkUid,
+      onUpdateHistoryTitle,
       forbidLoadChat,
-      onChangeChatId,
-      loadHistories
+      onChangeChatId
     ]
   );
 
@@ -406,16 +409,12 @@ const Render = (props: Props) => {
   const { localUId } = useShareChatStore();
   const outLinkUid: string = authToken || cardNo || localUId;
 
-  const { data: histories = [], runAsync: loadHistories } = useRequest2(
-    () => (shareId && outLinkUid ? getChatHistories({ shareId, outLinkUid }) : Promise.resolve([])),
-    {
-      manual: false,
-      refreshDeps: [shareId, outLinkUid]
-    }
-  );
+  const contextParams = useMemo(() => {
+    return { shareId, outLinkUid };
+  }, [shareId, outLinkUid]);
 
   return hasPermission ? (
-    <ChatContextProvider histories={histories} loadHistories={loadHistories}>
+    <ChatContextProvider params={contextParams}>
       <OutLink {...props} cardNo={cardNo} />;
     </ChatContextProvider>
   ) : (

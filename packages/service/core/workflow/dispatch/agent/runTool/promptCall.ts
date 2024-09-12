@@ -180,7 +180,8 @@ export const runToolWithPromptCall = async (
       dispatchFlowResponse: response?.dispatchFlowResponse || [],
       totalTokens: response?.totalTokens ? response.totalTokens + tokens : tokens,
       completeMessages,
-      assistantResponses: [...assistantResponses, ...toolNodeAssistant.value]
+      assistantResponses: [...assistantResponses, ...toolNodeAssistant.value],
+      runTimes: (response?.runTimes || 0) + 1
     };
   }
 
@@ -226,7 +227,10 @@ export const runToolWithPromptCall = async (
               isEntry: true,
               inputs: updateToolInputValue({ params: startParams, inputs: item.inputs })
             }
-          : item
+          : {
+              ...item,
+              isEntry: false
+            }
       )
     });
 
@@ -315,7 +319,8 @@ ANSWER: `;
       dispatchFlowResponse,
       totalTokens: response?.totalTokens ? response.totalTokens + tokens : tokens,
       completeMessages: filterMessages,
-      assistantResponses: toolNodeAssistants
+      assistantResponses: toolNodeAssistants,
+      runTimes: (response?.runTimes || 0) + toolsRunResponse.moduleRunResponse.runTimes
     };
   }
 
@@ -327,7 +332,8 @@ ANSWER: `;
     {
       dispatchFlowResponse,
       totalTokens: response?.totalTokens ? response.totalTokens + tokens : tokens,
-      assistantResponses: toolNodeAssistants
+      assistantResponses: toolNodeAssistants,
+      runTimes: (response?.runTimes || 0) + toolsRunResponse.moduleRunResponse.runTimes
     }
   );
 };
