@@ -144,15 +144,6 @@ const InputGuideConfig = ({
               <>
                 <Flex mt={8} alignItems={'center'}>
                   <FormLabel>{chatT('custom_input_guide_url')}</FormLabel>
-                  <Flex
-                    onClick={() => window.open(getDocPath('/docs/course/chat_input_guide'))}
-                    color={'primary.700'}
-                    alignItems={'center'}
-                    cursor={'pointer'}
-                  >
-                    <MyIcon name={'book'} w={'17px'} ml={4} mr={1} color={'myGray.600'} />
-                    {commonT('common.Documents')}
-                  </Flex>
                   <Box flex={'1 0 0'} />
                 </Flex>
                 <Textarea

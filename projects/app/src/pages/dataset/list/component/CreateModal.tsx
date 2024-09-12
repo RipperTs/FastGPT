@@ -130,7 +130,7 @@ const CreateModal = ({
       <ModalBody py={6} px={9}>
         <Box>
           <Box mb={1} color={'myGray.900'} fontWeight={500} fontSize={'sm'}>
-            {t('common:core.dataset.Dataset Type')}
+            {t('common:common.Set Name')}
           </Box>
           <Flex mt={'12px'} alignItems={'center'}>
             <MyTooltip label={t('common:common.avatar.Select Avatar')}>

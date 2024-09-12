@@ -155,6 +155,7 @@ services:
       - SANDBOX_URL=http://sandbox:3000
       # 日志等级: debug, info, warn, error
       - LOG_LEVEL=warn
+      - STORE_LOG_LEVEL=warn
     volumes:
       - ./config.json:/app/data/config.json
 

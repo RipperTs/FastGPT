@@ -81,13 +81,7 @@ const Logs = () => {
           </Box>
           <Box color={'myGray.500'} fontSize={'sm'}>
             <Box>{`日志会记录该应对的所有对话记录, 无论是通过分享或API形式的对话记录.`}</Box>
-            <Box
-              as={'span'}
-              mr={2}
-              textDecoration={'underline'}
-              cursor={'pointer'}
-              onClick={onOpenMarkDesc}
-            >
+            <Box as={'span'} mr={2}>
               API 需要传递 chatId 参数来区分对话窗口 (聊天历史记录关联), 传递 outLinkUid
               参数来区分不同的使用者.
             </Box>
@@ -133,7 +127,7 @@ const Logs = () => {
                   </Td>
                   <Td>
                     <Box>
-                      {item.source === 'share' ? (
+                      {item.source === 'share' || item.source === 'api' ? (
                         item.outLinkUid
                       ) : (
                         <Tag key={item._id} type={'fill'} colorSchema="white">
