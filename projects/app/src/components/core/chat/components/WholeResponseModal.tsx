@@ -620,7 +620,7 @@ export const ResponseBox = React.memo(function ResponseBox({
               />
             </Box>
           </Box>
-          <Box flex={'5 0 0'} height={'100%'}>
+          <Box flex={'5 0 0'} height={'100%'} overflow={'auto'}>
             <WholeResponseContent
               activeModule={activeModule}
               hideTabs={hideTabs}
